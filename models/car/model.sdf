@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.11">
+    <model name="car">
+        <link name="body">
+            <inertial auto="true">
+                <density>1000</density>
+            </inertial>
+            <collision name="collisional">
+                <geometry>
+                    <box>
+                        <size>1 1 1</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual1">
+                <geometry>
+                    <box>
+                        <size>1 1 1</size>
+                    </box>
+                </geometry>
+                <material>
+                    <ambient>1.0 0.0 1.0 1</ambient>
+                    <diffuse>1.0 0.0 1.0 1</diffuse>
+                    <specular>1.0 0.0 1.0 1</specular>
+                </material>
+            </visual>
+        </link>
+    </model>
+</sdf>
