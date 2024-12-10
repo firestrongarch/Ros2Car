@@ -33,3 +33,14 @@
 | ubuntu      | 24.04       |
 | ros2   | jazzy        |
 | gazebo   | harmonic        |
+
+## 3 仿真运行
+3.1 创建桥接器转换话题
+```
+ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist
+```
+3.2 启动teleop控制小车移动
+```
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+3.3 启动Rviz2可视化运行状态
