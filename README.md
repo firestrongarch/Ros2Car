@@ -9,6 +9,7 @@
 | HDR-TH_2P-P2.54-V-F   | 1        |
 | CONN-TH_XH2.54-6P   | 2        |
 | lm2596模块   | 1        |
+
 ![这是图片](schematic.svg "原理图")
 ### 1.2 上位机
     jetson nano开发板
