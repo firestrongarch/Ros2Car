@@ -49,4 +49,6 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 3.3 启动Rviz2可视化运行状态
 ```
 rviz2
+
+ros2 run ros_gz_bridge parameter_bridge /model/car/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry
 ```

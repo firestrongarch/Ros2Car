@@ -6,7 +6,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 def generate_launch_description():
     # 获取默认路径
     urdf_tutorial_path = get_package_share_directory('ros2car')
-    default_model_path = urdf_tutorial_path + '/models/car/model.sdf'
+    default_model_path = urdf_tutorial_path + '/models/car/urdf.sdf'
     # default_rviz_config_path = urdf_tutorial_path + '/config/rviz/display_model.rviz'
     # 为 Launch 声明参数
     action_declare_arg_mode_path = launch.actions.DeclareLaunchArgument(
