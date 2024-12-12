@@ -120,6 +120,7 @@
 
         <!--caster wheel-->
         <link name='caster'>
+            <!-- <pose>0.8 0 -0.2 0 0 0</pose> -->
             <pose relative_to='caster_frame'/>
             <inertial>
                 <mass>1</mass>
@@ -193,7 +194,7 @@
             <wheel_separation>1.2</wheel_separation>
             <wheel_radius>0.4</wheel_radius>
             <odom_publish_frequency>1</odom_publish_frequency>
-            <topic>cmd_vel</topic>
+            <!-- <topic>cmd_vel</topic> -->
         </plugin>   
 
         <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
@@ -202,7 +203,7 @@
         <link name="camera">
             <pose degrees="true">1.5 0 0.75 0 0 0</pose>
             <inertial auto="true">
-                <density>1000</density>
+                <density>100</density>
             </inertial>
             <collision name="collisional">
                 <geometry>

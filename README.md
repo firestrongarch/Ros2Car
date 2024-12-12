@@ -45,10 +45,14 @@ ros2 run ros_gz_bridge parameter_bridge /camera@sensor_msgs/msg/Image@gz.msgs.Im
 3.2 启动teleop控制小车移动
 ```
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
+# 或者话题映射到自定义话题
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=model/car/cmd_vel
 ```
-3.3 启动Rviz2可视化运行状态
+3.3 启动luanch
 ```
-rviz2
+source ./install/setup.zsh
 
-ros2 run ros_gz_bridge parameter_bridge /model/car/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry
+ros2 launch ros2car test.py
 ```
+3.4 控制小车移动
+![这是图片](test.gif "底盘")
