@@ -10,7 +10,7 @@
 | CONN-TH_XH2.54-6P   | 2        |
 | lm2596模块   | 1        |
 
-![这是图片](schematic.svg "原理图")
+![这是图片](doc/schematic.svg "原理图")
 ### 1.2 上位机
     jetson nano开发板
 ### 1.3 电机参数
@@ -26,7 +26,7 @@
 | 额定扭矩   | 1.5kg.cm        |
 
 ### 1.4 底盘
-![这是图片](chassis.png "底盘")
+![这是图片](doc/chassis.png "底盘")
 ## 2 上位机软件环境
 | 软件      | 版本 |
 | ----------- | ----------- |
@@ -55,4 +55,4 @@ source ./install/setup.zsh
 ros2 launch ros2car test.py
 ```
 3.4 控制小车移动
-![这是图片](test.gif "底盘")
+![这是图片](doc/test.gif "底盘")
