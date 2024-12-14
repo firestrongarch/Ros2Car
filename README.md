@@ -56,3 +56,40 @@ ros2 launch ros2car test.py
 ```
 3.4 控制小车移动
 ![这是图片](doc/test.gif "底盘")
+
+## 4 实物运行
+### 4.1 串口驱动
+```
+# 下载ch341驱动和ch343驱动，在driver目录下运行
+make
+sudo make load
+sudo make install
+
+# 查看内核缓冲
+sudo dmesg
+
+# 查看usb
+lsusb
+
+# 设置串口权限，加入dialout用户组，username替换为你的用户名
+sudo usermod -aG dialout username
+
+# 查看用户组
+cat /etc/group|grep 组名
+```
+### 4.2 配置platformIO
+```
+# 为clangd生成compile_commands.json
+pio run -t compiledb
+```
+问题：algorithm头文件无法找到，原因是riscv-esp32库默认使用C编译，不会生成C++头文件索引。但是用户代码使用C++编译，所以clangd会识别arduino中的c++部分，导致错误。
+
+### 4.3 开发Airm2m_core_esp32c3
+（1）串口通信
+```
+// 初始化串口
+Serial.begin(115200);
+Serial.println(val)
+```
+
+### 4.4 开发esp32CAM
