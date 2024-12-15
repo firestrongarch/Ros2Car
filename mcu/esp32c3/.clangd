@@ -1,2 +1,6 @@
 CompileFlags:
     Remove: [-fstrict-volatile-bitfields,-fno-tree-switch-conversion,-D__cplusplus]
+Diagnostics:
+    Suppress: [pp_file_not_found]
+    UnusedIncludes: None
+    MissingIncludes: None

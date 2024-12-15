@@ -52,6 +52,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:
 ```
 source ./install/setup.zsh
 
+# 自动配置桥接器和话题，启动gazebo和rviz，注意gazebo需要手动启动仿真
 ros2 launch ros2car test.py
 ```
 3.4 控制小车移动
@@ -82,7 +83,9 @@ cat /etc/group|grep 组名
 # 为clangd生成compile_commands.json
 pio run -t compiledb
 ```
-问题：algorithm头文件无法找到，原因是riscv-esp32库默认使用C编译，不会生成C++头文件索引。但是用户代码使用C++编译，所以clangd会识别arduino中的c++部分，导致错误。
+问题1：algorithm头文件无法找到，原因是riscv-esp32库默认使用C编译，不会生成C++头文件索引。但是用户代码使用C++编译，所以clangd会识别arduino中的c++部分，导致错误。 解决方法：使用 Suppress: [pp_file_not_found]字段解决
+
+问题2: xtensa-esp32-elf-g++未知三元组。 解决方法：更新clangd服务器至19.2版本
 
 ### 4.3 开发Airm2m_core_esp32c3
 （1）串口通信
@@ -93,3 +96,5 @@ Serial.println(val)
 ```
 
 ### 4.4 开发esp32CAM
+注意：ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
+

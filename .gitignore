@@ -54,3 +54,5 @@ install
 log
 
 .cache
+.vscode
+compile_commands.json
