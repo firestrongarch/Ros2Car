@@ -4,4 +4,4 @@ CompileFlags:
         -fno-tree-switch-conversion]
 Diagnostics:
     Suppress: [pp_file_not_found,ovl_no_viable_member_function_in_call,
-        member_function_call_bad_type,typecheck_nonviable_condition]
+        member_function_call_bad_type,typecheck_nonviable_condition,ovl_no_viable_function_in_call]
