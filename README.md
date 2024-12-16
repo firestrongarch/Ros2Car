@@ -132,6 +132,7 @@ ros2 run micro_ros_setup build_firmware.sh
 
 # 刷写固件
 ros2 run micro_ros_setup flash_firmware.sh
+
 ---------
 
 # 创建自定义静态 micro-ROS 库
@@ -146,7 +147,7 @@ set(CMAKE_C_COMPILER (path)/riscv32-esp-elf-gcc)
 set(CMAKE_CXX_COMPILER (path)/riscv32-esp-elf-g++)
 set(CMAKE_AR (path)/riscv32-esp-elf-gcc-ar)
 
-# 编译自定义静态库
+# 编译自定义静态库,将会得到libmicroros.a
 ros2 run micro_ros_setup build_firmware.sh $(pwd)/my_custom_toolchain.cmake $(pwd)/my_custom_colcon.meta
 ```
 
@@ -176,7 +177,17 @@ docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host mi
 docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host microros/micro-ros-agent:$ROS_DISTRO canfd --dev [YOUR CAN INTERFACE] -v6
 
 ```
-### 4.3 开发Airm2m_core_esp32c3
+
+### 4.4 使用platformio自动配置micro_ros
+```
+# platformio.ini
+board_microros_transport = wifi
+board_microros_distro = jazzy
+lib_deps = 
+	https://github.com/firestrongarch/micro_ros_platformio
+```
+
+### 4.5 开发Airm2m_core_esp32c3
 (1)串口通信
 ```
 // 初始化串口
@@ -184,6 +195,6 @@ Serial.begin(115200);
 Serial.println(val)
 ```
 
-### 4.4 开发esp32CAM
-注意：ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
+### 4.6 开发esp32CAM
+注意: ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
 
