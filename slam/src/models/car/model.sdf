@@ -200,7 +200,8 @@
         <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
             <render_engine>ogre2</render_engine>
         </plugin>
-        <link name="camera">
+
+        <link name="sensor">
             <pose degrees="true">1.5 0 0.75 0 0 0</pose>
             <inertial auto="true">
                 <density>100</density>
@@ -224,7 +225,8 @@
                     <specular>0.0 1.0 1.0 1</specular>
                 </material>
             </visual>
-            <sensor name="camera" type="camera">
+
+            <sensor name="rgbd_camera" type="rgbd_camera">   
                 <camera>
                     <horizontal_fov>1.047</horizontal_fov>
                     <image>
@@ -239,14 +241,20 @@
                 <always_on>1</always_on>
                 <update_rate>30</update_rate>
                 <visualize>true</visualize>
-                <topic>camera</topic>
+                <topic>model/car/sensor</topic>
+                <enable_metrics>true</enable_metrics>
             </sensor>
         </link>
 
-        <joint name="camera_joint" type="fixed">
-            <!-- <pose relative_to="chassis">0.5 0 1 0 0 0</pose> -->
+        <joint name="sensor_joint" type="fixed">
             <parent>chassis</parent>
-            <child>camera</child>
+            <child>sensor</child>
         </joint>
+
+        <!-- <joint name="rgbd_camera_joint" type="fixed">
+            <parent>sensor</parent>
+            <child>rgbd_camera</child>
+        </joint> -->
+
     </model>
 </sdf>

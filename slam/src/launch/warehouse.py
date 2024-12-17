@@ -46,7 +46,7 @@ def generate_launch_description():
             pkg_ros_gz_sim_demos,
             'models',
             'world',
-            'test.sdf'
+            'warehouse.sdf'
         ])}.items(),
     )
 
@@ -68,6 +68,12 @@ def generate_launch_description():
             # Velocity and odometry (Gazebo -> ROS2)
             gz_topic + '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
             gz_topic + '/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry',
+            # # 单目相机 (Gazebo -> ROS2)
+            # gz_topic + '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
+            # 深度相机 (Gazebo -> ROS2)
+            gz_topic + '/sensor/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
+            gz_topic + '/sensor/image@sensor_msgs/msg/Image[gz.msgs.Image',
+            gz_topic + '/sensor/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
         ],
         remappings=[
             (joint_state_gz_topic, 'joint_states'),
@@ -101,10 +107,46 @@ def generate_launch_description():
         ]
     )
 
+    rtabmap_parameters = [{
+        'frame_id':'car/sensor/rgbd_camera',
+        'subscribe_depth':True,
+        'subscribe_odom_info':True,
+        'approx_sync':False
+    }]
+
+    rtabmap_remappings=[
+        # ('odom', '/model/car/odometry'), # 此话题不需要映射
+        ('rgb/image', '/model/car/sensor/image'),
+        ('rgb/camera_info', '/model/car/sensor/camera_info'),
+        ('depth/image', '/model/car/sensor/depth_image')
+    ]
+
+    rtabmap_odom = Node(
+        package='rtabmap_odom', executable='rgbd_odometry', output='screen',
+        parameters= rtabmap_parameters,
+        remappings= rtabmap_remappings
+    )
+
+    rtabmap_slam = Node(
+        package='rtabmap_slam', executable='rtabmap', output='screen',
+        parameters= rtabmap_parameters,
+        remappings= rtabmap_remappings,
+        arguments=['-d']
+    )
+
+    rtabmap_viz = Node(
+        package='rtabmap_viz', executable='rtabmap_viz', output='screen',
+        parameters = rtabmap_parameters,
+        remappings = rtabmap_remappings
+    )
+
     return LaunchDescription([
         rviz_launch_arg,
         gazebo,
         bridge,
         robot_state_publisher,
-        rviz
+        rviz,
+        rtabmap_odom,
+        rtabmap_slam,
+        rtabmap_viz
     ])
