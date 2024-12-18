@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 
-install(DIRECTORY launch models rviz
+install(DIRECTORY launch models rviz config
   DESTINATION share/${PROJECT_NAME}
 )
 

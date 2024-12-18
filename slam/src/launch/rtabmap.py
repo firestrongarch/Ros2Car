@@ -71,9 +71,9 @@ def generate_launch_description():
             # # 单目相机 (Gazebo -> ROS2)
             # gz_topic + '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
             # 深度相机 (Gazebo -> ROS2)
-            gz_topic + '/sensor/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
-            gz_topic + '/sensor/image@sensor_msgs/msg/Image[gz.msgs.Image',
-            gz_topic + '/sensor/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            gz_topic + '/sensor/rgbd/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
+            gz_topic + '/sensor/rgbd/image@sensor_msgs/msg/Image[gz.msgs.Image',
+            gz_topic + '/sensor/rgbd/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
         ],
         remappings=[
             (joint_state_gz_topic, 'joint_states'),
@@ -108,17 +108,17 @@ def generate_launch_description():
     )
 
     rtabmap_parameters = [{
-        'frame_id':'car/sensor/rgbd_camera',
+        'frame_id':'car/rgbd_frame',
         'subscribe_depth':True,
         'subscribe_odom_info':True,
-        'approx_sync':False
+        'approx_sync':True
     }]
 
     rtabmap_remappings=[
         # ('odom', '/model/car/odometry'), # 此话题不需要映射
-        ('rgb/image', '/model/car/sensor/image'),
-        ('rgb/camera_info', '/model/car/sensor/camera_info'),
-        ('depth/image', '/model/car/sensor/depth_image')
+        ('rgb/image', '/model/car/sensor/rgbd/image'),
+        ('rgb/camera_info', '/model/car/sensor/rgbd/camera_info'),
+        ('depth/image', '/model/car/sensor/rgbd/depth_image')
     ]
 
     rtabmap_odom = Node(

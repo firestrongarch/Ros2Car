@@ -77,15 +77,21 @@ nav_msgs/msg/Odometry@gz.msgs.Odometry // 里程计信息
 #相机
 sensor_msgs/msg/Image[gz.msgs.Image // 图像信息
 sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo // 相机信息
+
+# 雷达
+sensor_msgs/msg/LaserScan[gz.msgs.LaserScan
+sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked 
 ```
 
 (3) sdf相关问题
 ```
 # 传感器需要设置pose字段, 默认pose不会生成transform信息, 无法给满足slam要求
-# CameraInfo的frame不能直接转化到sensor, 需要配置插件gz::sim::systems::PosePublisher
+# CameraInfo的frame不能直接转化到sensor, 需要设置/sensor/camera/optical_frame_id
+# 也可以使用<gz_frame_id>, 会发生警告但不影响使用
 <sensor name="rgbd_camera" type="rgbd_camera">
     <pose relative_to='sensor'>0 0 0 0 0 0</pose>
     <camera>
+        <optical_frame_id>car/sensor</optical_frame_id>
         <horizontal_fov>1.047</horizontal_fov>
         <image>
         <width>320</width>
@@ -103,8 +109,13 @@ sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo // 相机信息
     <enable_metrics>true</enable_metrics>
 </sensor>
 ```
+(4) gazebo问题
+```
+# 激光雷达需要扫描到物体才会在rviz2中显示
+# sdf中collsion与visual不同时, gazebo可能会出错
+```
 
-(4) 运行测试程序
+(5) 运行测试程序
 ```
 source ./install/setup.zsh
 ros2 launch ros2car test.py

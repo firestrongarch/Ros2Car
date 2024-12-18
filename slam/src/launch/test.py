@@ -71,9 +71,12 @@ def generate_launch_description():
             # # 单目相机 (Gazebo -> ROS2)
             # gz_topic + '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
             # 深度相机 (Gazebo -> ROS2)
-            gz_topic + '/sensor/rgbd_camera/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
-            gz_topic + '/sensor/rgbd_camera/image@sensor_msgs/msg/Image[gz.msgs.Image',
-            gz_topic + '/sensor/rgbd_camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            gz_topic + '/sensor/rgbd/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
+            gz_topic + '/sensor/rgbd/image@sensor_msgs/msg/Image[gz.msgs.Image',
+            gz_topic + '/sensor/rgbd/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            # 雷达 (Gazebo -> ROS2)
+            gz_topic + '/sensor/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            # gz_topic + '/sensor/lidar/points@sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked',
         ],
         remappings=[
             (joint_state_gz_topic, 'joint_states'),

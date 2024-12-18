@@ -5,7 +5,7 @@
 
         <!--chassis-->
         <link name='chassis'>
-            <pose relative_to='__model__'>0.5 0 0.4 0 0 0</pose>
+            <pose relative_to='__model__'>0 0 0.1 0 0 0</pose>
             <inertial> <!--inertial properties of the link mass, inertia matix-->
                 <mass>1.14395</mass>
                 <inertia>
@@ -20,7 +20,7 @@
             <visual name='visual'>
                 <geometry>
                     <box>
-                        <size>2.0 1.0 0.5</size>
+                        <size>0.2 0.1 0.02</size>
                     </box>
                 </geometry>
                 <!--Color of the link-->
@@ -33,7 +33,7 @@
             <collision name='collision'>
                 <geometry>
                     <box>
-                        <size>2.0 1.0 0.5</size>
+                        <size>0.2 0.1 0.02</size>
                     </box>
                 </geometry>
             </collision>
@@ -41,7 +41,7 @@
 
         <!--Left wheel-->
         <link name='left_wheel'>
-            <pose relative_to="chassis">-0.5 0.6 0 -1.5707 0 0</pose> <!--angles are in radian-->
+            <pose relative_to="chassis">-0.05 0.06 0 -1.5707 0 0</pose> <!--angles are in radian-->
             <inertial>
                 <mass>1</mass>
                 <inertia>
@@ -56,8 +56,8 @@
             <visual name='visual'>
                 <geometry>
                     <cylinder>
-                        <radius>0.4</radius>
-                        <length>0.2</length>
+                        <radius>0.04</radius>
+                        <length>0.02</length>
                     </cylinder>
                 </geometry>
                 <material>
@@ -69,8 +69,8 @@
             <collision name='collision'>
                 <geometry>
                     <cylinder>
-                        <radius>0.4</radius>
-                        <length>0.2</length>
+                        <radius>0.04</radius>
+                        <length>0.02</length>
                     </cylinder>
                 </geometry>
             </collision>
@@ -78,7 +78,7 @@
 
         <!--The same as left wheel but with different position-->
         <link name='right_wheel'>
-            <pose relative_to="chassis">-0.5 -0.6 0 -1.5707 0 0</pose> <!--angles are in radian-->
+            <pose relative_to="chassis">-0.05 -0.06 0 -1.5707 0 0</pose> <!--angles are in radian-->
             <inertial>
                 <mass>1</mass>
                 <inertia>
@@ -93,8 +93,8 @@
             <visual name='visual'>
                 <geometry>
                     <cylinder>
-                        <radius>0.4</radius>
-                        <length>0.2</length>
+                        <radius>0.04</radius>
+                        <length>0.02</length>
                     </cylinder>
                 </geometry>
                 <material>
@@ -106,8 +106,8 @@
             <collision name='collision'>
                 <geometry>
                     <cylinder>
-                        <radius>0.4</radius>
-                        <length>0.2</length>
+                        <radius>0.04</radius>
+                        <length>0.02</length>
                     </cylinder>
                 </geometry>
             </collision>
@@ -115,7 +115,7 @@
 
         <!--arbitrary frame-->
         <frame name="caster_frame" attached_to='chassis'>
-            <pose>0.8 0 -0.2 0 0 0</pose>
+            <pose relative_to='chassis'>0.08 0 -0.02 0 0 0</pose>
         </frame>
 
         <!--caster wheel-->
@@ -136,7 +136,7 @@
             <visual name='visual'>
                 <geometry>
                     <sphere>
-                        <radius>0.2</radius>
+                        <radius>0.02</radius>
                     </sphere>
                 </geometry>
                 <material>
@@ -148,7 +148,7 @@
             <collision name='collision'>
                 <geometry>
                     <sphere>
-                        <radius>0.2</radius>
+                        <radius>0.02</radius>
                     </sphere>
                 </geometry>
             </collision>
@@ -201,22 +201,26 @@
             <render_engine>ogre2</render_engine>
         </plugin>
 
+        <link name="rgbd_frame">
+            <pose relative_to="sensor">0.02 0 0 0 0 0</pose>
+        </link>
+
         <link name="sensor">
-            <pose degrees="true">1.5 0 0.75 0 0 0</pose>
+            <pose relative_to='chassis'>0.08 0 0.02 0 0 0</pose>
             <inertial auto="true">
                 <density>100</density>
             </inertial>
             <collision name="collisional">
                 <geometry>
                     <box>
-                        <size>0.2 0.2 0.2</size>
+                        <size>0.02 0.02 0.02</size>
                     </box>
                 </geometry>
             </collision>
             <visual name="visual1">
                 <geometry>
                     <box>
-                        <size>0.2 0.2 0.2</size>
+                        <size>0.02 0.02 0.02</size>
                     </box>
                 </geometry>
                 <material>
@@ -226,8 +230,9 @@
                 </material>
             </visual>
 
-            <sensor name="rgbd_camera" type="rgbd_camera">   
+            <sensor name="rgbd" type="rgbd_camera">   
                 <camera>
+                    <optical_frame_id>car/rgbd_frame</optical_frame_id>
                     <horizontal_fov>1.047</horizontal_fov>
                     <image>
                     <width>320</width>
@@ -241,8 +246,32 @@
                 <always_on>1</always_on>
                 <update_rate>30</update_rate>
                 <visualize>true</visualize>
-                <topic>model/car/sensor</topic>
+                <topic>model/car/sensor/rgbd</topic>
                 <enable_metrics>true</enable_metrics>
+            </sensor>
+
+            <sensor name='lidar' type='gpu_lidar'>"
+                <gz_frame_id>car/sensor</gz_frame_id>
+                <pose relative_to="sensor">0 0 0.02 0 0 0</pose>
+                <topic>model/car/sensor/lidar</topic>
+                <update_rate>10</update_rate>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>360</samples>
+                            <resolution>1</resolution>
+                            <min_angle>0.0</min_angle>
+                            <max_angle>6.28</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.12</min>
+                        <max>3.5</max>
+                        <resolution>0.015</resolution>
+                    </range>
+                </ray>
+                <always_on>1</always_on>
+                <visualize>true</visualize>
             </sensor>
         </link>
 
@@ -251,10 +280,10 @@
             <child>sensor</child>
         </joint>
 
-        <!-- <joint name="rgbd_camera_joint" type="fixed">
+        <joint name="rgbd_joint" type="fixed">
             <parent>sensor</parent>
-            <child>rgbd_camera</child>
-        </joint> -->
+            <child>rgbd_frame</child>
+        </joint>
 
     </model>
 </sdf>

@@ -43,9 +43,13 @@
         </link>
     </model>
 
+    <frame name="map">
+        <pose>0 0 0 0 0 0</pose>
+    </frame>
+
     <model name="car">
         <self_collide>true</self_collide>
-        <pose>0 0 0 0 0 0</pose>
+        <pose relative_to="map">0 0 0 0 0 0</pose>
         <include merge="true">
             <uri>car</uri>
         </include>
@@ -61,7 +65,7 @@
             <publish_link_pose>true</publish_link_pose>
             <use_pose_vector_msg>true</use_pose_vector_msg>
             <static_publisher>true</static_publisher>
-            <static_update_frequency>1</static_update_frequency>
+            <!-- <static_update_frequency>1</static_update_frequency> -->
         </plugin>
 
         <plugin
