@@ -1,11 +1,9 @@
 <?xml version="1.0" ?>
 <sdf version="1.11">
     <model name='car' canonical_link='chassis'>
-        <!-- <pose relative_to='world'>0 0 0 0 0 0</pose>   the pose is relative to the world by default -->
-
         <!--chassis-->
         <link name='chassis'>
-            <pose relative_to='__model__'>0 0 0.1 0 0 0</pose>
+            <pose relative_to='__model__'>0 0 0.04 0 0 0</pose>
             <inertial> <!--inertial properties of the link mass, inertia matix-->
                 <mass>1.14395</mass>
                 <inertia>
@@ -25,9 +23,9 @@
                 </geometry>
                 <!--Color of the link-->
                 <material>
-                    <ambient>0.0 0.0 1.0 1</ambient>
-                    <diffuse>0.0 0.0 1.0 1</diffuse>
-                    <specular>0.0 0.0 1.0 1</specular>
+                    <ambient>0.0 0.0 1 1</ambient>
+                    <diffuse>0.0 0.0 1 1</diffuse>
+                    <specular>0.0 0.0 1 1</specular>
                 </material>
             </visual>
             <collision name='collision'>
@@ -205,6 +203,10 @@
             <pose relative_to="sensor">0.02 0 0 0 0 0</pose>
         </link>
 
+        <link name="lidar_frame">
+            <pose relative_to="sensor">0 0 0.05 0 0 0</pose>
+        </link>
+
         <link name="sensor">
             <pose relative_to='chassis'>0.08 0 0.02 0 0 0</pose>
             <inertial auto="true">
@@ -251,10 +253,11 @@
             </sensor>
 
             <sensor name='lidar' type='gpu_lidar'>"
-                <gz_frame_id>car/sensor</gz_frame_id>
-                <pose relative_to="sensor">0 0 0.02 0 0 0</pose>
+                <!-- 这条位姿为实际雷达位置 -->
+                <pose relative_to="sensor">0 0 0.05 0 0 0</pose>
+                <gz_frame_id>car/lidar_frame</gz_frame_id>
                 <topic>model/car/sensor/lidar</topic>
-                <update_rate>10</update_rate>
+                <update_rate>5</update_rate>
                 <ray>
                     <scan>
                         <horizontal>
@@ -283,6 +286,11 @@
         <joint name="rgbd_joint" type="fixed">
             <parent>sensor</parent>
             <child>rgbd_frame</child>
+        </joint>
+
+        <joint name="lidar_joint" type="fixed">
+            <parent>sensor</parent>
+            <child>lidar_frame</child>
         </joint>
 
     </model>

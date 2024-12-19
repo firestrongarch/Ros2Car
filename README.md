@@ -113,6 +113,7 @@ sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked
 ```
 # 激光雷达需要扫描到物体才会在rviz2中显示
 # sdf中collsion与visual不同时, gazebo可能会出错
+# 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
 ```
 
 (5) 运行测试程序
@@ -129,10 +130,26 @@ sudo apt install ros-$ROS_DISTRO-rtabmap-ros
 
 # 运行rtabmap
 source ./install/setup.zsh
-ros2 launch ros2car warehouse.py
+ros2 launch ros2car rtabmap.py
 
 ```
+(2) cartographer, 支持雷达传感器
+```
+source ./install/setup.zsh
+ros2 launch ros2car cartographer.py
 
+问题1: passed to lookupTransform argument target_frame does not exist
+解决: 设置正确的track_frame, 同时发布tf关系
+
+问题2: passed to lookupTransform argument source_frame does not exist
+解决: 设置正确的传感器数据frame, 同时发布tf关系
+
+问题3: Check failed: data.time > std::prev(trajectory.end())->first, 出现这个问题似乎是传感器数据以相同的时间戳到达
+解决: odometry_sampling_ratio 改为0.1 (暂时解决)
+
+问题4: Trying to create a map of size,地图一直在扩大
+解决: 应该和问题3有关,可以暂时不使用机器人odom, 设置use_odometry = false, 但是rviz会缺少机器人模型和位置
+```
 
 ## 4 实物运行
 ### 4.1 串口驱动

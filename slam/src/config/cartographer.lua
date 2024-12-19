@@ -5,16 +5,16 @@ options = {
   map_builder = MAP_BUILDER,
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map",
-  tracking_frame = "base_link",
+  tracking_frame = "car/odom",
   -- base_link改为odom,发布map到odom之间的位姿态
-  published_frame = "odom",
-  odom_frame = "odom",
+  published_frame = "car/odom",
+  odom_frame = "car/odom",
   -- true改为false，不用提供里程计数据
   provide_odom_frame = false,
   -- false改为true，仅发布2D位资
   publish_frame_projected_to_2d = true,
   -- false改为true，使用里程计数据
-  use_odometry = true,
+  use_odometry = false,
   use_nav_sat = false,
   use_landmarks = false,
   -- 0改为1,使用一个雷达
@@ -29,7 +29,7 @@ options = {
   pose_publish_period_sec = 5e-3,
   trajectory_publish_period_sec = 30e-3,
   rangefinder_sampling_ratio = 1.,
-  odometry_sampling_ratio = 1.,
+  odometry_sampling_ratio = 0.3,
   fixed_frame_pose_sampling_ratio = 1.,
   imu_sampling_ratio = 1.,
   landmarks_sampling_ratio = 1.,

@@ -1,18 +1,37 @@
 
 import os
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
-
 
 def generate_launch_description():
-    # 定位到功能包的地址
-    pkg_share = FindPackageShare(package='ros2car').find('ros2car')
-    
+
+    pkg_share = get_package_share_directory('ros2car')
+    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+
+    sdf_file = os.path.join(pkg_share, 'models', 'car', 'model.sdf')
+
+    with open(sdf_file, 'r') as infp:
+        robot_desc = infp.read()
+
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py'),
+        ),
+        launch_arguments={'gz_args': PathJoinSubstitution([
+            pkg_share,
+            'models',
+            'world',
+            'test.sdf'
+        ])}.items(),
+    )
     #=====================运行节点需要的配置=======================================================================
     # 是否使用仿真时间，我们用gazebo，这里设置成true
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    # use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     # 地图的分辨率
     resolution = LaunchConfiguration('resolution', default='0.05')
     # 地图的发布周期
@@ -48,6 +67,8 @@ def generate_launch_description():
             gz_topic + '/sensor/rgbd/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
             gz_topic + '/sensor/rgbd/image@sensor_msgs/msg/Image[gz.msgs.Image',
             gz_topic + '/sensor/rgbd/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            # 雷达 (Gazebo -> ROS2)
+            gz_topic + '/sensor/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
         ],
         remappings=[
             (joint_state_gz_topic, 'joint_states'),
@@ -58,36 +79,61 @@ def generate_launch_description():
         output='screen'
     )
 
-    #=====================声明三个节点，cartographer/occupancy_grid_node/rviz_node=================================
+    #=====================声明节点，cartographer/occupancy_grid_node/rviz_node=================================
+    topic_remappings = [
+        # ('odom', '/model/car/odometry'), 
+        ('scan', '/model/car/sensor/lidar'), 
+        # ('rgb/image', '/model/car/sensor/rgbd/image'),
+        # ('rgb/camera_info', '/model/car/sensor/rgbd/camera_info'),
+        # ('depth/image', '/model/car/sensor/rgbd/depth_image')
+    ]
+    
     cartographer_node = Node(
         package='cartographer_ros',
         executable='cartographer_node',
         name='cartographer_node',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time}],
+        # parameters=[{'use_sim_time': use_sim_time}],
         arguments=['-configuration_directory', configuration_directory,
-                   '-configuration_basename', configuration_basename])
+                   '-configuration_basename', configuration_basename],
+        remappings = topic_remappings
+    )
 
     cartographer_occupancy_grid_node = Node(
         package='cartographer_ros',
         executable='cartographer_occupancy_grid_node',
         name='cartographer_occupancy_grid_node',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time}],
-        arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec])
+        # parameters=[{'use_sim_time': use_sim_time}],
+        arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec],
+        remappings = topic_remappings
+    )
 
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
         arguments=['-d', rviz_config_dir],
-        parameters=[{'use_sim_time': use_sim_time}],
+        # parameters=[{'use_sim_time': use_sim_time}],
         output='screen')
 
-    #===============================================定义启动文件========================================================
-    ld = LaunchDescription()
-    ld.add_action(cartographer_node)
-    ld.add_action(cartographer_occupancy_grid_node)
-    ld.add_action(rviz_node)
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='both',
+        parameters=[
+            {'use_sim_time': True},
+            {'robot_description': robot_desc},
+        ]
+    )
 
-    return ld
+    #===============================================定义启动文件========================================================
+    return LaunchDescription([
+        gazebo,
+        bridge,
+        robot_state_publisher,
+        rviz_node,
+        cartographer_node,
+        cartographer_occupancy_grid_node,
+    ])

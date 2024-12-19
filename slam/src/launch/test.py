@@ -25,10 +25,10 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    pkg_ros_gz_sim_demos = get_package_share_directory('ros2car')
+    pkg_share_dir = get_package_share_directory('ros2car')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
-    sdf_file = os.path.join(pkg_ros_gz_sim_demos, 'models', 'car', 'model.sdf')
+    sdf_file = os.path.join(pkg_share_dir, 'models', 'car', 'model.sdf')
 
     with open(sdf_file, 'r') as infp:
         robot_desc = infp.read()
@@ -43,7 +43,7 @@ def generate_launch_description():
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py'),
         ),
         launch_arguments={'gz_args': PathJoinSubstitution([
-            pkg_ros_gz_sim_demos,
+            pkg_share_dir,
             'models',
             'world',
             'test.sdf'
@@ -103,7 +103,7 @@ def generate_launch_description():
     rviz = Node(
         package='rviz2',
         executable='rviz2',
-        arguments=['-d', os.path.join(pkg_ros_gz_sim_demos, 'rviz', 'ros2car.rviz')],
+        arguments=['-d', os.path.join(pkg_share_dir, 'rviz', 'ros2car.rviz')],
         condition=IfCondition(LaunchConfiguration('rviz')),
         parameters=[
             {'use_sim_time': True},
