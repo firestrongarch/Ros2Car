@@ -46,7 +46,7 @@ def generate_launch_description():
             pkg_ros_gz_sim_demos,
             'models',
             'world',
-            'warehouse.sdf'
+            'test.sdf'
         ])}.items(),
     )
 
@@ -111,11 +111,11 @@ def generate_launch_description():
         'frame_id':'car/rgbd_frame',
         'subscribe_depth':True,
         'subscribe_odom_info':True,
-        'approx_sync':True
+        'approx_sync':False
     }]
 
     rtabmap_remappings=[
-        # ('odom', '/model/car/odometry'), # 此话题不需要映射
+        # ('odom', '/model/car/odometry'), 
         ('rgb/image', '/model/car/sensor/rgbd/image'),
         ('rgb/camera_info', '/model/car/sensor/rgbd/camera_info'),
         ('depth/image', '/model/car/sensor/rgbd/depth_image')

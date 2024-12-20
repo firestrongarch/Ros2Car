@@ -114,12 +114,28 @@ sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked
 # 激光雷达需要扫描到物体才会在rviz2中显示
 # sdf中collsion与visual不同时, gazebo可能会出错
 # 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
+# 差速插件要设置准确的轮胎半径和轮胎距离, 同时模型需要正确的转动惯量和质量, 否则移动会出现异常或小车水平位置变化, 这将导致建图出现严重误差
 ```
 
 (5) 运行测试程序
 ```
 source ./install/setup.zsh
 ros2 launch ros2car test.py
+
+u-- 向左前方前进
+i-- 直行前进
+o-- 向右前方前进
+
+j-- 逆时针旋转
+k-- 停止
+l-- 顺时针旋转
+
+m-- 向左后方后退
+，-- 后退
+. – 向右后方后退
+
+q – 增加速度
+z – 减小速度
 ```
 ![这是图片](doc/test.gif "底盘")
 ### 3.2 SLAM运行
@@ -147,8 +163,11 @@ ros2 launch ros2car cartographer.py
 问题3: Check failed: data.time > std::prev(trajectory.end())->first, 出现这个问题似乎是传感器数据以相同的时间戳到达
 解决: odometry_sampling_ratio 改为0.1 (暂时解决)
 
-问题4: Trying to create a map of size,地图一直在扩大
-解决: 应该和问题3有关,可以暂时不使用机器人odom, 设置use_odometry = false, 但是rviz会缺少机器人模型和位置
+问题4: Trying to create a map of size,地图一直在扩大, 或地图有重影
+解决: 应该和问题3有关, 可以暂时不使用机器人odom, 设置use_odometry = false, 但是rviz会缺少机器人模型和位置
+
+问题5: odom波动很大, 地图出现重影
+解决: 小车模型设置出错, 导致里程计出现偏差
 ```
 
 ## 4 实物运行
@@ -207,7 +226,7 @@ source install/local_setup.bash
 # Run agent
 ros2 run micro_ros_agent micro_ros_agent [parameters]
 ```
-(3) 编译MCU固件  参考链接[编译静态micro-ROS库](https://micro.ros.org/docs/tutorials/advanced/create_custom_static_library/)
+(3) 编译MCU固件  参考[编译静态micro-ROS库](https://micro.ros.org/docs/tutorials/advanced/create_custom_static_library/)
 ```
 # 适用于特定平台的 micro-ROS 独立模块
 ros2 run micro_ros_setup component --help

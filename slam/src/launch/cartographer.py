@@ -26,12 +26,14 @@ def generate_launch_description():
             pkg_share,
             'models',
             'world',
-            'test.sdf'
-        ])}.items(),
+            'new.sdf',
+        ]),
+        # 'time':'--initial-sim-time 0'
+        }.items(),
     )
     #=====================运行节点需要的配置=======================================================================
     # 是否使用仿真时间，我们用gazebo，这里设置成true
-    # use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     # 地图的分辨率
     resolution = LaunchConfiguration('resolution', default='0.05')
     # 地图的发布周期
@@ -75,13 +77,16 @@ def generate_launch_description():
             (link_pose_gz_topic, '/tf'),
             (link_pose_gz_topic + '_static', '/tf_static'),
         ],
-        parameters=[{'qos_overrides./tf_static.publisher.durability': 'transient_local'}],
+        parameters=[{
+            'qos_overrides./tf_static.publisher.durability': 'transient_local',
+            # 'use_sim_time': use_sim_time
+        }],
         output='screen'
     )
 
     #=====================声明节点，cartographer/occupancy_grid_node/rviz_node=================================
     topic_remappings = [
-        # ('odom', '/model/car/odometry'), 
+        ('odom', '/model/car/odometry'), 
         ('scan', '/model/car/sensor/lidar'), 
         # ('rgb/image', '/model/car/sensor/rgbd/image'),
         # ('rgb/camera_info', '/model/car/sensor/rgbd/camera_info'),

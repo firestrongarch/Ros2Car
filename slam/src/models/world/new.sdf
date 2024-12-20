@@ -1,0 +1,123 @@
+<sdf version='1.10'>
+  <world name='demo'>
+    <light name="sun" type="directional">
+        <cast_shadows>true</cast_shadows>
+        <pose>0 0 10 0 0 0</pose>
+        <diffuse>0.8 0.8 0.8 1</diffuse>
+        <specular>0.2 0.2 0.2 1</specular>
+        <attenuation>
+            <range>1000</range>
+            <constant>0.9</constant>
+            <linear>0.01</linear>
+            <quadratic>0.001</quadratic>
+        </attenuation>
+        <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+            <geometry>
+                <plane>
+                <normal>0 0 1</normal>
+                <size>100 100</size>
+                </plane>
+            </geometry>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <plane>
+                <normal>0 0 1</normal>
+                <size>100 100</size>
+                </plane>
+            </geometry>
+            <material>
+                <ambient>0.8 0.8 0.8 1</ambient>
+                <diffuse>0.8 0.8 0.8 1</diffuse>
+                <specular>0.8 0.8 0.8 1</specular>
+            </material>
+            </visual>
+        </link>
+    </model>
+
+    <model name="car">
+        <self_collide>true</self_collide>
+        <pose>0 0 0 0 0 0</pose>
+        <include merge="true">
+            <uri>car</uri>
+        </include>
+
+        <plugin 
+            filename="gz-sim-joint-state-publisher-system" 
+            name="gz::sim::systems::JointStatePublisher">
+        </plugin>
+
+        <plugin
+            filename="gz-sim-pose-publisher-system"
+            name="gz::sim::systems::PosePublisher">
+            <publish_link_pose>true</publish_link_pose>
+            <use_pose_vector_msg>true</use_pose_vector_msg>
+            <static_publisher>true</static_publisher>
+            <static_update_frequency>1</static_update_frequency>
+        </plugin>
+
+        <plugin
+            filename="gz-sim-odometry-publisher-system"
+            name="gz::sim::systems::OdometryPublisher">
+            <odom_frame>car/odom</odom_frame>
+            <robot_base_frame>car</robot_base_frame>
+        </plugin>
+    </model>
+
+    <model name='cylinder'>
+      <pose>3.6377381486572022 0.59647090485501131 0.50000230332778128 -2.4238314644171034e-06 4.721874308813875e-06 0.0068698314626172039</pose>
+      <link name='cylinder_link'>
+        <inertial>
+          <inertia>
+            <ixx>0.14580000000000001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.14580000000000001</iyy>
+            <iyz>0</iyz>
+            <izz>0.125</izz>
+          </inertia>
+          <mass>1</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+  </world>
+</sdf>

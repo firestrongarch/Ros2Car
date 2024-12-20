@@ -5,31 +5,27 @@ options = {
   map_builder = MAP_BUILDER,
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map",
-  tracking_frame = "car/odom",
-  -- base_link改为odom,发布map到odom之间的位姿态
-  published_frame = "car/odom",
+  tracking_frame = "car", --如果有imu填imu,没有imu则用base_link
+  published_frame = "car/odom", --有odom一般用odom，没有odom一般用base_link, 发布map到odom之间的位姿态
   odom_frame = "car/odom",
-  -- true改为false，不用提供里程计数据
-  provide_odom_frame = false,
+  provide_odom_frame = false, --底盘提供了里程计，这里不使用算法提供的里程计；如果没有底盘提供，则可以用cartographer提供的里程计，这里摄制成true
   -- false改为true，仅发布2D位资
   publish_frame_projected_to_2d = true,
   -- false改为true，使用里程计数据
-  use_odometry = false,
+  use_odometry = true, --是否使用里程计（底盘提供）
   use_nav_sat = false,
   use_landmarks = false,
-  -- 0改为1,使用一个雷达
-  num_laser_scans = 1,
-  -- 1改为0，不使用多波雷达
-  num_multi_echo_laser_scans = 0,
+  num_laser_scans = 1, -- 激光雷达数量
+  num_multi_echo_laser_scans = 0, --google提供的激光雷达，这里用不到，为0
   -- 10改为1，1/1=1等于不分割
-  num_subdivisions_per_laser_scan = 1,
+  num_subdivisions_per_laser_scan = 1, --每扫描一帧作为一帧，原始值为10帧为一帧
   num_point_clouds = 0,
   lookup_transform_timeout_sec = 0.2,
   submap_publish_period_sec = 0.3,
   pose_publish_period_sec = 5e-3,
   trajectory_publish_period_sec = 30e-3,
   rangefinder_sampling_ratio = 1.,
-  odometry_sampling_ratio = 0.3,
+  odometry_sampling_ratio = 0.5,
   fixed_frame_pose_sampling_ratio = 1.,
   imu_sampling_ratio = 1.,
   landmarks_sampling_ratio = 1.,
