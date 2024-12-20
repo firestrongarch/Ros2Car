@@ -115,6 +115,7 @@ sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked
 # sdf中collsion与visual不同时, gazebo可能会出错
 # 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
 # 差速插件要设置准确的轮胎半径和轮胎距离, 同时模型需要正确的转动惯量和质量, 否则移动会出现异常或小车水平位置变化, 这将导致建图出现严重误差
+# 如果小车运行很慢, 很可能是世界太卡导致的
 ```
 
 (5) 运行测试程序

@@ -7,9 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
-        - /RobotModel1/Links1
         - /Image1
-        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 695
@@ -62,6 +60,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        lidar_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         rgbd_frame:
           Alpha: 1
           Show Axes: false
@@ -227,6 +229,8 @@ Visualization Manager:
           Value: false
         car/left_wheel:
           Value: false
+        car/lidar_frame:
+          Value: true
         car/odom:
           Value: true
         car/rgbd_frame:
@@ -239,6 +243,10 @@ Visualization Manager:
           Value: false
         left_wheel:
           Value: false
+        lidar_frame:
+          Value: true
+        map:
+          Value: true
         rgbd_frame:
           Value: false
         right_wheel:
@@ -259,13 +267,29 @@ Visualization Manager:
               {}
             car/left_wheel:
               {}
+            car/lidar_frame:
+              {}
             car/rgbd_frame:
               {}
             car/right_wheel:
               {}
             car/sensor:
               {}
+        map:
+          {}
       Update Interval: 0
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        Trajectory 0: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /trajectory_node_list
       Value: true
   Enabled: true
   Global Options:
@@ -313,7 +337,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.855997085571289
+      Distance: 9.070465087890625
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -328,10 +352,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5203728675842285
+      Pitch: 0.5903728008270264
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.18366068601608276
+      Yaw: 0.1686607003211975
     Saved: ~
 Window Geometry:
   Displays:
