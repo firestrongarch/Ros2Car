@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /RobotModel1
         - /Image1
+        - /LaserScan1
         - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 695
@@ -60,14 +61,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        lidar_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        rgbd_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         right_wheel:
           Alpha: 1
           Show Axes: false
@@ -210,7 +203,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /model/car/sensor/lidar
+        Value: /scan
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -229,26 +222,20 @@ Visualization Manager:
           Value: false
         car/left_wheel:
           Value: false
-        car/lidar_frame:
-          Value: true
-        car/odom:
-          Value: true
-        car/rgbd_frame:
-          Value: true
         car/right_wheel:
           Value: false
         car/sensor:
           Value: false
+        car/sensor/rgbd:
+          Value: true
+        car/sensor/scan:
+          Value: true
         chassis:
           Value: false
         left_wheel:
           Value: false
-        lidar_frame:
+        odom:
           Value: true
-        map:
-          Value: true
-        rgbd_frame:
-          Value: false
         right_wheel:
           Value: false
         sensor:
@@ -259,7 +246,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        car/odom:
+        odom:
           car:
             car/caster:
               {}
@@ -267,23 +254,20 @@ Visualization Manager:
               {}
             car/left_wheel:
               {}
-            car/lidar_frame:
-              {}
-            car/rgbd_frame:
-              {}
             car/right_wheel:
               {}
             car/sensor:
-              {}
-        map:
-          {}
+              car/sensor/rgbd:
+                {}
+              car/sensor/scan:
+                {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        Trajectory 0: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -294,7 +278,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: car/odom
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -337,7 +321,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 9.070465087890625
+      Distance: 12.743350982666016
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

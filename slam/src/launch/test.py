@@ -66,8 +66,8 @@ def generate_launch_description():
             link_pose_gz_topic + '@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
             link_pose_gz_topic + '_static@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
             # Velocity and odometry (Gazebo -> ROS2)
-            gz_topic + '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
-            gz_topic + '/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry',
+            '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
+            '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry',
             # # 单目相机 (Gazebo -> ROS2)
             # gz_topic + '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
             # 深度相机 (Gazebo -> ROS2)
@@ -75,7 +75,7 @@ def generate_launch_description():
             gz_topic + '/sensor/rgbd/image@sensor_msgs/msg/Image[gz.msgs.Image',
             gz_topic + '/sensor/rgbd/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
             # 雷达 (Gazebo -> ROS2)
-            gz_topic + '/sensor/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             # gz_topic + '/sensor/lidar/points@sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked',
         ],
         remappings=[
@@ -116,7 +116,4 @@ def generate_launch_description():
         bridge,
         robot_state_publisher,
         rviz,
-        # rtabmap_odom,
-        # rtabmap_slam,
-        # rtabmap_viz
     ])

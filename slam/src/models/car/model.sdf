@@ -4,11 +4,8 @@
         <!--chassis-->
         <link name='chassis'>
             <pose relative_to='__model__'>0 0 0.04 0 0 0</pose>
-            <!-- <inertial auto="true">
-                <density>1000</density>
-            </inertial> -->
             <inertial>
-                <mass>0.05</mass>
+                <mass>0.2</mass>
                 <inertia>
                     <ixx>0.000168</ixx>
                     <ixy>0</ixy>
@@ -194,21 +191,16 @@
             <right_joint>right_wheel_joint</right_joint>
             <wheel_separation>0.12</wheel_separation>
             <wheel_radius>0.04</wheel_radius>
-            <odom_publish_frequency>1</odom_publish_frequency>
-            <!-- <topic>cmd_vel</topic> -->
+            <odom_publish_frequency>50</odom_publish_frequency>
+            <topic>cmd_vel</topic>
+            <odom_topic>odom</odom_topic>
+            <!-- <tf_topic>tf</tf_topic> -->
+            <frame_id>odom</frame_id>
         </plugin>   
 
         <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
             <render_engine>ogre2</render_engine>
         </plugin>
-
-        <link name="rgbd_frame">
-            <pose relative_to="sensor">0.02 0 0 0 0 0</pose>
-        </link>
-
-        <link name="lidar_frame">
-            <pose relative_to="sensor">0 0 0.05 0 0 0</pose>
-        </link>
 
         <link name="sensor">
             <pose relative_to='chassis'>0.08 0 0.02 0 0 0</pose>
@@ -237,7 +229,6 @@
 
             <sensor name="rgbd" type="rgbd_camera">   
                 <camera>
-                    <optical_frame_id>car/rgbd_frame</optical_frame_id>
                     <horizontal_fov>1.047</horizontal_fov>
                     <image>
                     <width>320</width>
@@ -251,15 +242,15 @@
                 <always_on>1</always_on>
                 <update_rate>30</update_rate>
                 <visualize>true</visualize>
-                <topic>model/car/sensor/rgbd</topic>
+                <topic>rgbd</topic>
                 <enable_metrics>true</enable_metrics>
             </sensor>
 
-            <sensor name='lidar' type='gpu_lidar'>"
+            <sensor name='scan' type='gpu_lidar'>"
                 <!-- 这条位姿为实际雷达位置 -->
                 <pose relative_to="sensor">0 0 0.05 0 0 0</pose>
-                <gz_frame_id>car/lidar_frame</gz_frame_id>
-                <topic>model/car/sensor/lidar</topic>
+                <!-- <gz_frame_id>scan</gz_frame_id> -->
+                <topic>scan</topic>
                 <update_rate>5</update_rate>
                 <ray>
                     <scan>
@@ -285,16 +276,5 @@
             <parent>chassis</parent>
             <child>sensor</child>
         </joint>
-
-        <joint name="rgbd_joint" type="fixed">
-            <parent>sensor</parent>
-            <child>rgbd_frame</child>
-        </joint>
-
-        <joint name="lidar_joint" type="fixed">
-            <parent>sensor</parent>
-            <child>lidar_frame</child>
-        </joint>
-
     </model>
 </sdf>

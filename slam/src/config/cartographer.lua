@@ -6,8 +6,8 @@ options = {
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map",
   tracking_frame = "car", --如果有imu填imu,没有imu则用base_link
-  published_frame = "car/odom", --有odom一般用odom，没有odom一般用base_link, 发布map到odom之间的位姿态
-  odom_frame = "car/odom",
+  published_frame = "odom", --有odom一般用odom，没有odom一般用base_link, 发布map到odom之间的位姿态
+  odom_frame = "odom",
   provide_odom_frame = false, --底盘提供了里程计，这里不使用算法提供的里程计；如果没有底盘提供，则可以用cartographer提供的里程计，这里摄制成true
   -- false改为true，仅发布2D位资
   publish_frame_projected_to_2d = true,

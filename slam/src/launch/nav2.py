@@ -1,29 +1,38 @@
-
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.conditions import IfCondition
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 
 def generate_launch_description():
+    #=============================1.定位到包的地址=============================================================
+    ros2car_dir = get_package_share_directory('ros2car')
+    nav2_bringup_dir = get_package_share_directory('nav2_bringup')
+    
+    
+    #=============================2.声明参数，获取配置文件路径===================================================
+    # use_sim_time 这里要设置成true,因为gazebo是仿真环境，其时间是通过/clock话题获取，而不是系统时间
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true') 
+    map_yaml_path = LaunchConfiguration('map',default=os.path.join(ros2car_dir,'maps','map.yaml'))
+    nav2_param_path = LaunchConfiguration('params_file',default=os.path.join(ros2car_dir,'config','nav2.yaml'))
+    rviz_config_dir = os.path.join(ros2car_dir,'rviz','ros2car.rviz')
 
-    pkg_share = get_package_share_directory('ros2car')
-    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-
-    sdf_file = os.path.join(pkg_share, 'models', 'car', 'model.sdf')
+    sdf_file = os.path.join(ros2car_dir, 'models', 'car', 'model.sdf')
 
     with open(sdf_file, 'r') as infp:
         robot_desc = infp.read()
+
+    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py'),
         ),
         launch_arguments={'gz_args': PathJoinSubstitution([
-            pkg_share,
+            ros2car_dir,
             'models',
             'world',
             'test.sdf',
@@ -31,20 +40,7 @@ def generate_launch_description():
         # 'time':'--initial-sim-time 0'
         }.items(),
     )
-    #=====================运行节点需要的配置=======================================================================
-    # 是否使用仿真时间，我们用gazebo，这里设置成true
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    # 地图的分辨率
-    resolution = LaunchConfiguration('resolution', default='0.05')
-    # 地图的发布周期
-    publish_period_sec = LaunchConfiguration('publish_period_sec', default='1.0')
-    # 配置文件夹路径
-    configuration_directory = LaunchConfiguration('configuration_directory',default= os.path.join(pkg_share, 'config') )
-    # 配置文件
-    configuration_basename = LaunchConfiguration('configuration_basename', default='cartographer.lua')
-    rviz_config_dir = os.path.join(pkg_share, 'rviz')+"/ros2car.rviz"
-    print(f"rviz config in {rviz_config_dir}")
-
+    
     # Bridge to forward tf and joint states to ros2
     gz_topic = '/model/car'
     joint_state_gz_topic = '/world/demo' + gz_topic + '/joint_state'
@@ -78,34 +74,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    #=====================声明节点，cartographer/occupancy_grid_node/rviz_node=================================
-    topic_remappings = [
-        ('odom', '/model/car/odometry'), 
-        ('scan', '/model/car/sensor/lidar'), 
-        # ('rgb/image', '/model/car/sensor/rgbd/image'),
-        # ('rgb/camera_info', '/model/car/sensor/rgbd/camera_info'),
-        # ('depth/image', '/model/car/sensor/rgbd/depth_image')
-    ]
-    
-    cartographer_node = Node(
-        package='cartographer_ros',
-        executable='cartographer_node',
-        name='cartographer_node',
-        output='screen',
-        # parameters=[{'use_sim_time': use_sim_time}],
-        arguments=['-configuration_directory', configuration_directory,
-                   '-configuration_basename', configuration_basename],
-    )
-
-    cartographer_occupancy_grid_node = Node(
-        package='cartographer_ros',
-        executable='cartographer_occupancy_grid_node',
-        name='cartographer_occupancy_grid_node',
-        output='screen',
-        # parameters=[{'use_sim_time': use_sim_time}],
-        arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec],
-    )
-
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -125,12 +93,19 @@ def generate_launch_description():
         ]
     )
 
-    #===============================================定义启动文件========================================================
+    #=============================3.声明启动launch文件，传入：地图路径、是否使用仿真时间以及nav2参数文件==============
+    nav2_bringup_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([nav2_bringup_dir,'/launch','/bringup_launch.py']),
+        launch_arguments={
+            'map': map_yaml_path,
+            'use_sim_time': use_sim_time,
+            'params_file': nav2_param_path,
+        }.items(),
+    )
     return LaunchDescription([
         gazebo,
         bridge,
         robot_state_publisher,
         rviz_node,
-        cartographer_node,
-        cartographer_occupancy_grid_node,
+        nav2_bringup_launch,
     ])

@@ -110,13 +110,17 @@ sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked
 </sensor>
 ```
 (4) gazebo问题
-```
-# 激光雷达需要扫描到物体才会在rviz2中显示
-# sdf中collsion与visual不同时, gazebo可能会出错
-# 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
-# 差速插件要设置准确的轮胎半径和轮胎距离, 同时模型需要正确的转动惯量和质量, 否则移动会出现异常或小车水平位置变化, 这将导致建图出现严重误差
-# 如果小车运行很慢, 很可能是世界太卡导致的
-```
+
+1. 差速小车仿真的话题和frame由四个插件组成: JointStatePublisher PosePublisher OdometryPublisher DiffDrive
+2. 机器人模型由robot_state_publisher包发布
+3. 激光雷达需要扫描到物体才会在rviz2中显示
+4. sdf中collsion与visual不同时, gazebo可能会出错
+5. 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
+6. 差速插件要设置准确的轮胎半径和轮胎距离, 同时模型需要正确的转动惯量和质量, 否则移动会出现异常或小车水平位置变化, 这将导致建图出现严重误差
+7. 如果小车运行很慢, 很可能是世界太卡导致的
+
+8. blender建模导出到sdf
+
 
 (5) 运行测试程序
 ```
@@ -154,6 +158,9 @@ ros2 launch ros2car rtabmap.py
 ```
 source ./install/setup.zsh
 ros2 launch ros2car cartographer.py
+```
+![这是图片](doc/cartographer.gif "cartographer运行状态")
+
 
 问题1: passed to lookupTransform argument target_frame does not exist
 解决: 设置正确的track_frame, 同时发布tf关系
@@ -165,10 +172,19 @@ ros2 launch ros2car cartographer.py
 解决: odometry_sampling_ratio 改为0.1 (暂时解决)
 
 问题4: Trying to create a map of size,地图一直在扩大, 或地图有重影
-解决: 应该和问题3有关, 可以暂时不使用机器人odom, 设置use_odometry = false, 但是rviz会缺少机器人模型和位置
+解决: 机器人odom的话题和frame设置错误, 导致odom与slam发布的odom冲突
 
-问题5: odom波动很大, 地图出现重影
-解决: 小车模型设置出错, 导致里程计出现偏差
+
+(3) 保存地图
+```
+# 安装地图服务
+sudo apt install ros-humble-nav2-map-server
+# 保存地图命名为map
+ros2 run nav2_map_server map_saver_cli -t map -f map
+```
+(4) nav2导航
+```
+# rviz应在nav2节点前启动, 确保可以收到地图数据
 ```
 
 ## 4 实物运行
