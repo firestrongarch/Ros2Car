@@ -6,6 +6,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.actions import TimerAction
 
 def generate_launch_description():
     #=============================1.定位到包的地址=============================================================
@@ -82,6 +83,14 @@ def generate_launch_description():
         # parameters=[{'use_sim_time': use_sim_time}],
         output='screen')
 
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        output='screen',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom']
+    )
+
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -102,10 +111,14 @@ def generate_launch_description():
             'params_file': nav2_param_path,
         }.items(),
     )
+
     return LaunchDescription([
+        rviz_node,
         gazebo,
         bridge,
         robot_state_publisher,
-        rviz_node,
-        nav2_bringup_launch,
+        TimerAction(
+            period=2.0,  # 这里设置延迟时间为2秒
+            actions=[nav2_bringup_launch]
+        ),
     ])

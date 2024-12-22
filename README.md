@@ -184,9 +184,12 @@ ros2 run nav2_map_server map_saver_cli -t map -f map
 ```
 (4) nav2导航
 ```
-# rviz应在nav2节点前启动, 确保可以收到地图数据
-```
 
+```
+问题1 nav2的地图话题只会发布一次, 确保rviz2在其之前启动且已经提前订阅好话题
+
+问题2 某插件 does not exist.
+解决: 在配置文件 ros2 In Iron and older versions, "/" was used instead of "::"
 ## 4 实物运行
 ### 4.1 串口驱动
 ```
