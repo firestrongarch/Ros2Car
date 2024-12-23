@@ -184,8 +184,10 @@ ros2 run nav2_map_server map_saver_cli -t map -f map
 ```
 (4) nav2导航
 ```
-
+source ./install/setup.zsh
+ros2 launch ros2car nav2.py
 ```
+![这是图片](doc/nav2.gif "nav2运行状态")
 问题1 rviz2不能加载地图
 原因: nav2的地图话题只会发布一次, 确保rviz2在其之前启动且已经提前订阅好话题
 
@@ -195,8 +197,10 @@ ros2 run nav2_map_server map_saver_cli -t map -f map
 问题3 某组件插件重复注册
 原因: ros2 jazzy版本后bt_navigator插件自动加载, 再次添加会报错
 
-问题4 无法移动
+问题4 cmd_vel收不到速度信息
 原因: jazzy后需要设置cmd_vel_in_topic为cmd_vel_smoothed而不是cmd_vel_raw
+
+注意: 要使用nav2提供的rviz配置文件, 否则功能不全
 ## 4 实物运行
 ### 4.1 串口驱动
 ```
