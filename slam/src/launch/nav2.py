@@ -20,6 +20,8 @@ def generate_launch_description():
     map_yaml_path = LaunchConfiguration('map',default=os.path.join(ros2car_dir,'maps','map.yaml'))
     nav2_param_path = LaunchConfiguration('params_file',default=os.path.join(ros2car_dir,'config','nav2.yaml'))
     rviz_config_dir = os.path.join(ros2car_dir,'rviz','ros2car.rviz')
+    rviz_config_dir2 = os.path.join(nav2_bringup_dir,'rviz','nav2_default_view.rviz')
+
 
     sdf_file = os.path.join(ros2car_dir, 'models', 'car', 'model.sdf')
 
@@ -79,7 +81,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', rviz_config_dir],
+        arguments=['-d', rviz_config_dir2],
         # parameters=[{'use_sim_time': use_sim_time}],
         output='screen')
 

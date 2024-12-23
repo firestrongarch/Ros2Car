@@ -186,10 +186,17 @@ ros2 run nav2_map_server map_saver_cli -t map -f map
 ```
 
 ```
-问题1 nav2的地图话题只会发布一次, 确保rviz2在其之前启动且已经提前订阅好话题
+问题1 rviz2不能加载地图
+原因: nav2的地图话题只会发布一次, 确保rviz2在其之前启动且已经提前订阅好话题
 
 问题2 某插件 does not exist.
 解决: 在配置文件 ros2 In Iron and older versions, "/" was used instead of "::"
+
+问题3 某组件插件重复注册
+原因: ros2 jazzy版本后bt_navigator插件自动加载, 再次添加会报错
+
+问题4 无法移动
+原因: jazzy后需要设置cmd_vel_in_topic为cmd_vel_smoothed而不是cmd_vel_raw
 ## 4 实物运行
 ### 4.1 串口驱动
 ```
