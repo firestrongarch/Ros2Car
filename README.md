@@ -336,3 +336,10 @@ Serial.println(val)
 ### 4.6 开发esp32CAM
 注意: ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
 
+### 4.7 雷达驱动 HLDS HLS-LFCD-LDS (LDS-01)
+```
+# 安装LDS-01雷达驱动
+sudo apt install ros-jazzy-hls-lfcd-lds-driver
+```
+问题1: qos不兼容导致rviz2显示不出雷达
+解决: 在雷达话题显示菜单中, 选择Reliability Policy为Best Effort
