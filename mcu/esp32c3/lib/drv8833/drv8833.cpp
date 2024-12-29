@@ -6,7 +6,7 @@ drv8833::drv8833(const int &A1, const int &A2,const int &eep):A1_{A1},A2_{A2},ee
   pinMode(A2_,OUTPUT);
   pinMode(eep_,OUTPUT);
 
-  digitalWrite(eep_,LOW);
+  digitalWrite(eep_,HIGH);
   digitalWrite(A1_,LOW);
   digitalWrite(A2_,LOW);
 }
@@ -21,7 +21,7 @@ A1_{A1},A2_{A2},B1_{PB1},B2_{B2},eep_{eep}
   pinMode(eep_,OUTPUT);
   pinMode(12,OUTPUT);
 
-  digitalWrite(eep_,LOW);
+  digitalWrite(eep_,HIGH);
   digitalWrite(A1_,LOW);
   digitalWrite(A2_,LOW);
   digitalWrite(B1_,LOW);

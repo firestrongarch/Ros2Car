@@ -326,12 +326,25 @@ docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host mi
 ```
 
 ### 4.5 开发Airm2m_core_esp32c3
-(1)串口通信
+1. 串口通信
+💡确定串口名称/dev/ttyACM0
 ```
 // 初始化串口
 Serial.begin(115200);
 Serial.println(val)
 ```
+2. pwm输出, 使用analogwrite的方式实现
+```
+analogWrite(pin, dutycycle)：在指定的引脚上启用软件PWM。占空比在0到PWMRANGE之间，默认为1023。
+
+analogWrite(pin, 0)：禁用指定引脚上的PWM。
+
+analogWriteResolution(new_range)：该功能用于改变PWM分辨率。
+
+analogWriteFrequency(new_frequency)：调用此功能可将其更改为新频率.PWM频率范围为1 - 1000hz。
+```
+
+
 
 ### 4.6 开发esp32CAM
 注意: ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。

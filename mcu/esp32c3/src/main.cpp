@@ -8,6 +8,7 @@
 #include <geometry_msgs/msg/twist.h>
 
 #include <PID_v1.h> 
+#include "encoder.h"
 
 // 定义 ROS2 执行器和支持结构
 rclc_executor_t executor;
@@ -22,7 +23,7 @@ geometry_msgs__msg__Twist sub_msg;
 
 const int PWMA1 = 18;
 const int PWMA2 = 19;
-const int ENCAa = 2;
+const int ENCAa = 2;  // right
 const int ENCAb = 3;
 int countA = 0; //如果是正转，那么每计数一次自增1，如果是反转，那么每计数一次自减1 
 
@@ -37,6 +38,7 @@ const int eep = 5;
 
 // 定义控制两个电机的对象
 drv8833 motors(PWMA1,PWMA2,PWMB1,PWMB2,eep);
+Encoder encoder(ENCBa,ENCBb,ENCAa,ENCAb);
 
 // drv8833电源
 volatile byte state = LOW;
@@ -100,7 +102,7 @@ void microros_task(void *param)
 {
   // 设置 micro-ROS 代理的 IP 地址。
   IPAddress agent_ip;
-  agent_ip.fromString("192.168.202.252");
+  agent_ip.fromString("192.168.164.252");
 
   char ssid[] = "K50U";
   char pass[] = "88888888";
@@ -135,21 +137,22 @@ void microros_task(void *param)
 
 void setup()
 {
-  // 初始化串口
-  Serial.begin(115200);
+    // 初始化串口
+    Serial.begin(115200);
 
-  //将中断触发引脚（2号引脚）设置为INPUT_PULLUP（输入上拉）模式
-  pinMode(button, INPUT_PULLUP); 
- 
-  //设置中断触发程序
-  attachInterrupt(digitalPinToInterrupt(button), power, FALLING);
+    // //将中断触发引脚（2号引脚）设置为INPUT_PULLUP（输入上拉）模式
+    // pinMode(button, INPUT_PULLUP); 
+    
+    // //设置中断触发程序
+    // attachInterrupt(digitalPinToInterrupt(button), power, FALLING);
 
-  // 在核心0上创建一个名为"microros_task"的任务，栈大小为10240
-  xTaskCreatePinnedToCore(microros_task, "microros_task", 10240, NULL, 1, NULL, 0);
+    // 在核心0上创建一个名为"microros_task"的任务，栈大小为10240
+    xTaskCreatePinnedToCore(microros_task, "microros_task", 10240, NULL, 1, NULL, 0);
 }
 
 void loop()
 {
-  motors.updateState(state);
-  delay(10);
+    // motors.updateState(state);
+    delay(10);
+    encoder.get_current_vel();
 }
