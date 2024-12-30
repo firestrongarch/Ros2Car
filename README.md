@@ -136,11 +136,11 @@ k-- 停止
 l-- 顺时针旋转
 
 m-- 向左后方后退
-，-- 后退
-. – 向右后方后退
+,-- 后退
+. - 向右后方后退
 
-q – 增加速度
-z – 减小速度
+q - 增加速度
+z - 减小速度
 ```
 ![这是图片](doc/test.gif "底盘")
 ### 3.2 SLAM运行
@@ -205,6 +205,12 @@ ros2 launch ros2car nav2.py
 ### 4.1 串口驱动
 ```
 # 下载ch341驱动和ch343驱动, 在driver目录下运行
+http://gh.llkk.cc/https://github.com/WCHSoftGroup/ch341ser_linux
+
+# 编译内核所需
+sudo apt install kernel-headers-$(uname -r)
+sudo apt install kernel-devel-$(uname -r)
+
 make
 sudo make load
 sudo make install
@@ -292,7 +298,7 @@ set(CMAKE_AR (path)/riscv32-esp-elf-gcc-ar)
 ros2 run micro_ros_setup build_firmware.sh $(pwd)/my_custom_toolchain.cmake $(pwd)/my_custom_colcon.meta
 ```
 
-错误警告:bomb::bomb::bomb: : do not exist list index: 1 out of range (-1, 0)
+错误警告:💣 do not exist list index: 1 out of range (-1, 0)
 ```
 # 错误原因是路径包含中文(史诗级巨坑),耗时两天才找到原因,很难想象2024年不支持UTF-8。仅将目录改为英文:
 export LANG=en_US
@@ -347,12 +353,36 @@ analogWriteFrequency(new_frequency)：调用此功能可将其更改为新频率
 
 
 ### 4.6 开发esp32CAM
+用于采集单目RGB图像, 目前暂时用不到, 后续可能使用其他相机
 注意: ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
 
-### 4.7 雷达驱动 HLDS HLS-LFCD-LDS (LDS-01)
+### 4.7 香橙派
+香橙派orangepi-zero3-1.5G, 目前仅用于数据传输, 数据处理交给PC处理
+1. 雷达驱动
 ```
-# 安装LDS-01雷达驱动
+# 安装HLDS HLS-LFCD-LDS (LDS-01)雷达驱动
 sudo apt install ros-jazzy-hls-lfcd-lds-driver
+
+# 安装EAI-X2驱动
+git clone http://gh.llkk.cc/https://github.com/fishros/ydlidar_ros2 -b  fishbot
+
+cd ydlidar_ros2
+colcon build
+
+# 注意香橙派串口连接到26pin的10号引脚uart5(RX) 
+sudo chmod 666 /dev/ttyS5
+source install/setup.zsh
+ros2 launch ydlidar ydlidar_launch.py
+
+# 💡Linux系统中 uart5 默认是关闭的，需要手动打开才能使用。
+sudo orangepi-config
+然后选择 System->Hardware->ph-uart5(空格选中)->Save->Back->Reboot
+
+# 上述步骤完成后, 此时可在上位机中查看雷达话题
+ros2 topic list
+
+# 也可以直接在rviz2中显示
+rviz2
 ```
 问题1: qos不兼容导致rviz2显示不出雷达
 解决: 在雷达话题显示菜单中, 选择Reliability Policy为Best Effort
