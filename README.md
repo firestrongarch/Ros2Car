@@ -354,8 +354,11 @@ analogWriteFrequency(new_frequency)：调用此功能可将其更改为新频率
 
 ### 4.6 开发esp32CAM
 用于采集单目RGB图像, 目前暂时用不到, 后续可能使用其他相机
-注意: ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
+1. 引脚定义
+![这是图片](doc/esp32cam.png "esp32cam")
 
+⚠ ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
+GPIO1 和 GPIO3分别为uart0的rx和tx
 ### 4.7 香橙派
 香橙派orangepi-zero3-1.5G, 目前仅用于数据传输, 数据处理交给PC处理
 1. 雷达驱动
@@ -369,7 +372,7 @@ git clone http://gh.llkk.cc/https://github.com/fishros/ydlidar_ros2 -b  fishbot
 cd ydlidar_ros2
 colcon build
 
-# 注意香橙派串口连接到26pin的10号引脚uart5(RX) 
+# 注意香橙派串口连接到26pin的10号引脚uart5(RX)或者连接uart0(串口调试引脚)
 sudo chmod 666 /dev/ttyS5
 source install/setup.zsh
 ros2 launch ydlidar ydlidar_launch.py

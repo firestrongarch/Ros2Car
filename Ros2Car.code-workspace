@@ -1,18 +1,18 @@
 {
 	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "mcu/esp32c3"
-		},
-		{
-			"name": "esp32cam",
-			"path": "mcu/esp32cam"
-		},
-		{
-			"path": "slam"
-		}
-	],
+        {
+            "path": "."
+        },
+        {
+            "path": "mcu/esp32c3"
+        },
+        {
+            "name": "esp32cam",
+            "path": "mcu/esp32cam"
+        },
+        {
+            "path": "slam"
+        }
+    ],
 	"settings": {}
 }
