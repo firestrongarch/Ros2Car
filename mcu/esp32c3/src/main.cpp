@@ -100,39 +100,38 @@ void twist_callback(const void *msg_in)
 // 这个函数是一个后台任务，负责设置和处理与 micro-ROS 代理的通信。
 void microros_task(void *param)
 {
-  // 设置 micro-ROS 代理的 IP 地址。
-  IPAddress agent_ip;
-  agent_ip.fromString("192.168.164.252");
+    // 设置 micro-ROS 代理的 IP 地址。
+    IPAddress agent_ip;
+    agent_ip.fromString("192.168.164.252");
 
-  char ssid[] = "K50U";
-  char pass[] = "88888888";
+    char ssid[] = "K50U";
+    char pass[] = "88888888";
 
-  // 使用 WiFi 网络和代理 IP 设置 micro-ROS 传输层。
-  set_microros_wifi_transports(ssid, pass, agent_ip, 8888);
+    // 使用 WiFi 网络和代理 IP 设置 micro-ROS 传输层。
+    set_microros_wifi_transports(ssid, pass, agent_ip, 8888);
 
-  // 等待 2 秒，以便网络连接得到建立。
-  delay(2000);
+    // 等待 2 秒，以便网络连接得到建立。
+    delay(2000);
 
-  // 设置 micro-ROS 支持结构、节点和订阅。
-  allocator = rcl_get_default_allocator();
-  rclc_support_init(&support, 0, NULL, &allocator);
-  rclc_node_init_default(&node, "esp32_car", "", &support);
-  rclc_subscription_init_default(
-      &subscriber,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-      "/cmd_vel");
+    // 设置 micro-ROS 支持结构、节点和订阅。
+    allocator = rcl_get_default_allocator();
+    rclc_support_init(&support, 0, NULL, &allocator);
+    rclc_node_init_default(&node, "esp32_car", "", &support);
+    rclc_subscription_init_default(
+        &subscriber,
+        &node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        "/cmd_vel");
 
-  // 设置 micro-ROS 执行器，并将订阅添加到其中。
-  rclc_executor_init(&executor, &support.context, 1, &allocator);
-  rclc_executor_add_subscription(&executor, &subscriber, &sub_msg, &twist_callback, ON_NEW_DATA);
+    // 设置 micro-ROS 执行器，并将订阅添加到其中。
+    rclc_executor_init(&executor, &support.context, 1, &allocator);
+    rclc_executor_add_subscription(&executor, &subscriber, &sub_msg, &twist_callback, ON_NEW_DATA);
 
-  // 循环运行 micro-ROS 执行器以处理传入的消息。
-  while (true)
-  {
-    delay(100);
-    rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100));
-  }
+    // 循环运行 micro-ROS 执行器以处理传入的消息。
+    while (true){
+        delay(100);
+        rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100));
+    }
 }
 
 void setup()

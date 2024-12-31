@@ -359,6 +359,9 @@ analogWriteFrequency(new_frequency)：调用此功能可将其更改为新频率
 
 ⚠ ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
 GPIO1 和 GPIO3分别为uart0的rx和tx
+
+❌ LoadProhibited, StoreProhibited 当应用程序尝试读取或写入无效的内存位置时，会发生此类 CPU 异常。
+
 ### 4.7 香橙派
 香橙派orangepi-zero3-1.5G, 目前仅用于数据传输, 数据处理交给PC处理
 1. 雷达驱动
