@@ -10,8 +10,6 @@
 #include <micro_ros_utilities/string_utilities.h>
 #include <micro_ros_utilities/type_utilities.h>
 
-#include "esp_camera.h"
-#include "camera_index.h"
 #define CAMERA_MODEL_AI_THINKER // Has PSRAM
 #include "camera_pins.h"
 

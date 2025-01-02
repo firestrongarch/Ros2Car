@@ -1,3 +1,12 @@
+---
+title: "Habits"
+author: John Doe
+date: March 22, 2005
+output:
+    pdf_document:
+        latex_engine: pdflatex
+---
+
 # Ros2Car
 
 ## 1 硬件环境
@@ -339,7 +348,7 @@ GPIO1 和 GPIO3分别为uart0的rx和tx
 ❌ LoadProhibited, StoreProhibited 当应用程序尝试读取或写入无效的内存位置时，会发生此类 CPU 异常。
 
 #### 相机矫正 🤔
-相机需要矫正内参矩阵和畸变矩阵, 内参矩阵的$f_x$和$f_y$由相机焦距和光电二极管尺寸决定, 偏移量$c_x$和$c_y$由相机光心的位置决定(因为像素坐标系原点在左上角, 相机坐标系在光心位置)
+相机需要矫正内参矩阵和畸变矩阵, 内参矩阵的 $f_x$ 和 $f_y$ 由相机焦距和光电二极管尺寸决定, 偏移量 $c_x$ 和 $c_y$ 由相机光心的位置决定(因为像素坐标系原点在左上角, 相机坐标系在光心位置)
 ![](doc/camera.png "相机内参原理")
 #### 图像处理ISP 🧩
 此部分由ESP32CAM完成, 主要将RAW图像转化为可以用于SLAM的图像
@@ -374,3 +383,20 @@ rviz2
 ```
 问题1: qos不兼容导致rviz2显示不出雷达
 解决: 在雷达话题显示菜单中, 选择Reliability Policy为Best Effort
+
+# MarkDown本地渲染配置
+```
+# 安装katex
+sudo apt install katex
+
+# 安装mathtex
+sudo apt install node-mathjax-full
+
+# 安装pandoc, 用于导出pdf
+sudo apt install pandox
+sudo apt install texlive-full
+
+sudo apt-get install librsvg2-bin # export svg
+sudo apt-get install texlive-latex-base # pdflatex
+sudo apt-get install texlive-latex-extra # color
+```
