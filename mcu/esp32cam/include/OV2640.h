@@ -4,8 +4,6 @@
 #include <Arduino.h>
 #include <pgmspace.h>
 #include <stdio.h>
-#include "esp_log.h"
-#include "esp_attr.h"
 #include "esp_camera.h"
 
 extern camera_config_t esp32cam_config, esp32cam_aithinker_config, esp32cam_ttgo_t_config;
