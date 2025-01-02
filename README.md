@@ -43,8 +43,8 @@ export GZ_SIM_RESOURCE_PATH=/home/fu/Desktop/Ros2Car/models
 ```
 
 ## 3 仿真运行
-### 3.1 话题需求
-(1) 常用命令
+### 3.1 话题与坐标系
+#### 常用命令
 ```
 # 桥接cmd_vel
 ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist
@@ -64,7 +64,7 @@ colcon build
 source ./install/setup.zsh
 ros2 launch ros2car test.py
 ```
-(2) ros2与gazebo常用话题及数据类型
+#### ros2与gazebo
 ```
 # 机器人模型
 sensor_msgs/msg/JointState[gz.msgs.Model // 关节信息
@@ -83,46 +83,21 @@ sensor_msgs/msg/LaserScan[gz.msgs.LaserScan
 sensor_msgs/msg/LaserScan[gz.msgs.PointCloudPacked 
 ```
 
-(3) sdf相关问题
-```
-# 传感器需要设置pose字段, 默认pose不会生成transform信息, 无法给满足slam要求
-# CameraInfo的frame不能直接转化到sensor, 需要设置/sensor/camera/optical_frame_id
-# 也可以使用<gz_frame_id>, 会发生警告但不影响使用
-<sensor name="rgbd_camera" type="rgbd_camera">
-    <pose relative_to='sensor'>0 0 0 0 0 0</pose>
-    <camera>
-        <optical_frame_id>car/sensor</optical_frame_id>
-        <horizontal_fov>1.047</horizontal_fov>
-        <image>
-        <width>320</width>
-        <height>240</height>
-        </image>
-        <clip>
-        <near>0.1</near>
-        <far>100</far>
-        </clip>
-    </camera>
-    <always_on>1</always_on>
-    <update_rate>30</update_rate>
-    <visualize>true</visualize>
-    <topic>model/car/sensor/rgbd_camera</topic>
-    <enable_metrics>true</enable_metrics>
-</sensor>
-```
-(4) gazebo问题
+#### 坐标转化
+- 传感器需要设置pose字段, 默认pose不会生成transform信息, 无法给满足slam要求
+- CameraInfo的frame不能直接转化到sensor, 需要设置/sensor/camera/optical_frame_id, 也可以使用<gz_frame_id>, 会发生警告但不影响使用, 也可以在gz::sim::systems::PosePublisher插件设置<publish_sensor_pose>
 
-1. 差速小车仿真的话题和frame由四个插件组成: JointStatePublisher PosePublisher OdometryPublisher DiffDrive
-2. 机器人模型由robot_state_publisher包发布
-3. 激光雷达需要扫描到物体才会在rviz2中显示
-4. sdf中collsion与visual不同时, gazebo可能会出错
-5. 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
-6. 差速插件要设置准确的轮胎半径和轮胎距离, 同时模型需要正确的转动惯量和质量, 否则移动会出现异常或小车水平位置变化, 这将导致建图出现严重误差
-7. 如果小车运行很慢, 很可能是世界太卡导致的
+#### gazebo问题
+- 差速小车仿真的话题和frame由四个插件组成: JointStatePublisher PosePublisher OdometryPublisher DiffDrive
+- 机器人模型由robot_state_publisher包发布
+- 激光雷达需要扫描到物体才会在rviz2中显示
+- sdf中collsion与visual不同时, gazebo可能会出错
+- 使用ADS对物体着色 ambient环境光 diffuse漫反射光 specular镜面光
+- 差速插件要设置准确的轮胎半径和轮胎距离, 同时模型需要正确的转动惯量和质量, 否则移动会出现异常或小车水平位置变化, 这将导致建图出现严重误差
+- 如果小车运行很慢, 很可能是世界太卡导致的
+- blender建模导出到sdf
 
-8. blender建模导出到sdf
-
-
-(5) 运行测试程序
+#### 运行测试程序
 ```
 source ./install/setup.zsh
 ros2 launch ros2car test.py
@@ -144,9 +119,9 @@ z - 减小速度
 ```
 ![这是图片](doc/test.gif "底盘")
 ### 3.2 SLAM运行
-(1) rtabmap, 支持双目, RGBD和雷达传感器
+#### rtabmap
 ```
-# 安装rtabmap
+# 安装rtabmap,支持双目, RGBD和雷达传感器
 sudo apt install ros-$ROS_DISTRO-rtabmap-ros
 
 # 运行rtabmap
@@ -154,13 +129,12 @@ source ./install/setup.zsh
 ros2 launch ros2car rtabmap.py
 
 ```
-(2) cartographer, 支持雷达传感器
+#### cartographer
 ```
 source ./install/setup.zsh
 ros2 launch ros2car cartographer.py
 ```
 ![这是图片](doc/cartographer.gif "cartographer运行状态")
-
 
 问题1: passed to lookupTransform argument target_frame does not exist
 解决: 设置正确的track_frame, 同时发布tf关系
@@ -174,15 +148,14 @@ ros2 launch ros2car cartographer.py
 问题4: Trying to create a map of size,地图一直在扩大, 或地图有重影
 解决: 机器人odom的话题和frame设置错误, 导致odom与slam发布的odom冲突
 
-
-(3) 保存地图
+#### 保存地图
 ```
 # 安装地图服务
 sudo apt install ros-humble-nav2-map-server
 # 保存地图命名为map
 ros2 run nav2_map_server map_saver_cli -t map -f map
 ```
-(4) nav2导航
+#### nav2导航
 ```
 source ./install/setup.zsh
 ros2 launch ros2car nav2.py
@@ -236,9 +209,10 @@ pio run -t compiledb
 
 问题2: xtensa-esp32-elf-g++未知三元组。 解决方法: 更新clangd服务器至19.2版本
 
-### 4.3 手动配置micro_ros
-(1)编译micro_ros_setup, 该软件包基于ROS2, 用于创建micro-ROS Agent和firmware
+### 4.3 手动配置micro_ros 🛠️
+#### 编译micro_ros_setup
 ```
+# 该软件包基于ROS2, 用于创建micro-ROS Agent和firmware
 mkdir microros_ws
 cd microros_ws
 git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
@@ -251,7 +225,8 @@ sudo apt-get install python3-pip
 colcon build
 source install/local_setup.zsh
 ```
-(2)创建micro-ROS Agent, 负责PC的ROS2和MCU上的micro-ROS之间的通信。
+#### 创建micro-ROS Agent
+负责PC的ROS2和MCU上的micro-ROS之间的通信。
 ```
 # Download micro-ROS Agent packages
 ros2 run micro_ros_setup create_agent_ws.sh
@@ -263,9 +238,10 @@ source install/local_setup.bash
 # Run agent
 ros2 run micro_ros_agent micro_ros_agent [parameters]
 ```
-(3) 编译MCU固件  参考[编译静态micro-ROS库](https://micro.ros.org/docs/tutorials/advanced/create_custom_static_library/)
+#### 编译MCU固件 
+参考[编译静态micro-ROS库](https://micro.ros.org/docs/tutorials/advanced/create_custom_static_library/)
 ```
-# 适用于特定平台的 micro-ROS 独立模块
+# 适用于特定平台的 micro-ROS 独立模块 
 ros2 run micro_ros_setup component --help
 
 # 创建esp32idf示例, 将创建一个固件文件夹, 其中包含构建 micro-ROS 应用程序所需的代码
@@ -331,7 +307,7 @@ docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host mi
 
 ```
 
-### 4.5 开发Airm2m_core_esp32c3
+### 4.5 开发esp32c3
 1. 串口通信
 💡确定串口名称/dev/ttyACM0
 ```
@@ -353,8 +329,8 @@ analogWriteFrequency(new_frequency)：调用此功能可将其更改为新频率
 
 
 ### 4.6 开发esp32CAM
-用于采集单目RGB图像, 目前暂时用不到, 后续可能使用其他相机
-1. 引脚定义
+使用OV2640用于采集单目RGB图像, 目前暂时用不到, 后续可能使用其他相机
+#### 引脚定义 👣
 ![这是图片](doc/esp32cam.png "esp32cam")
 
 ⚠ ESP32-CAM 上的 IO0 和 GND 短接以进入下载模式（拔掉才可以运行程序！）。烧录时可能需要先复位或重新连接电脑。
@@ -362,9 +338,15 @@ GPIO1 和 GPIO3分别为uart0的rx和tx
 
 ❌ LoadProhibited, StoreProhibited 当应用程序尝试读取或写入无效的内存位置时，会发生此类 CPU 异常。
 
+#### 相机矫正 🤔
+相机需要矫正内参矩阵和畸变矩阵, 内参矩阵的$f_x$和$f_y$由相机焦距和光电二极管尺寸决定, 偏移量$c_x$和$c_y$由相机光心的位置决定(因为像素坐标系原点在左上角, 相机坐标系在光心位置)
+![](doc/camera.png "相机内参原理")
+#### 图像处理ISP 🧩
+此部分由ESP32CAM完成, 主要将RAW图像转化为可以用于SLAM的图像
+
 ### 4.7 香橙派
-香橙派orangepi-zero3-1.5G, 目前仅用于数据传输, 数据处理交给PC处理
-1. 雷达驱动
+香橙派orangepi-zero3-1.5G, 目前仅用于数据传输, 数据交给PC处理
+#### 雷达驱动 🧑‍🦽
 ```
 # 安装HLDS HLS-LFCD-LDS (LDS-01)雷达驱动
 sudo apt install ros-jazzy-hls-lfcd-lds-driver
