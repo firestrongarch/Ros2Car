@@ -10,4 +10,5 @@ public:
   drv8833(const int &A1,const int &A2,const int &PB1,const int &B2,const int &eep);
   void updateSpeed(int num,int speed);
   void updateState(volatile byte state);
+  void run(int left,int right);
 };

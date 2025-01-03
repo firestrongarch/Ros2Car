@@ -96,9 +96,17 @@ void Encoder::get_current_vel(){
     if(past_time >= interval_time){//如果逝去时间大于等于一个计算周期
         //1.禁止中断
         noInterrupts();
-        //2.计算转速 转速单位可以是秒，也可以是分钟... 自定义即可
-        left.current_vel = (double)left.count / per_round / past_time * 1000 * 60;
-        right.current_vel = (double)right.count / per_round / past_time * 1000 * 60;
+        //2.计算转速 
+        // 单位为转/分钟
+        // left.current_vel = (double)left.count / per_round / past_time * 1000 * 60;
+        // right.current_vel = (double)right.count / per_round / past_time * 1000 * 60;
+        // 单位为转/s left.count取反, 以底盘为参考系
+        left.current_vel = (double)-left.count / per_round / past_time * 1000;
+        right.current_vel = (double)right.count / per_round / past_time * 1000;
+        // 单位为m/s
+        static auto c = PI * wheel_diameter;
+        left.current_vel *= c;
+        right.current_vel *= c;
         //3.重置计数器
         left.count = 0;
         right.count = 0;
@@ -110,4 +118,14 @@ void Encoder::get_current_vel(){
         Serial.println(left.current_vel);
         Serial.println(right.current_vel);
     }
+}
+
+double* Encoder::get_pointer_left_vel()
+{
+    return &left.current_vel;
+}
+
+double* Encoder::get_pointer_right_vel()
+{
+    return &right.current_vel;
 }

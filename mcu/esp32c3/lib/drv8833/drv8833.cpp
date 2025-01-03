@@ -62,3 +62,9 @@ void drv8833::updateState(volatile byte state)
   digitalWrite(eep_, state);
   digitalWrite(12,state);
 }
+
+void drv8833::run(int left, int right){
+    if(left > 0){
+
+    }
+}
