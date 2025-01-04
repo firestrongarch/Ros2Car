@@ -1,6 +1,6 @@
 #include "encoder.h"
 #include "esp32-hal-gpio.h"
-#include <functional>
+
 // #include "esp32-hal-gpio.h"
 
 Encoder::Data Encoder::left{};
@@ -107,6 +107,8 @@ void Encoder::get_current_vel(){
         static auto c = PI * wheel_diameter;
         left.current_vel *= c;
         right.current_vel *= c;
+
+        this->update_bot_odom(past_time / 1000.0);
         //3.重置计数器
         left.count = 0;
         right.count = 0;
@@ -115,17 +117,17 @@ void Encoder::get_current_vel(){
         //5.重启中断
         interrupts();
         Serial.println("left & right:");
-        Serial.println(left.current_vel);
-        Serial.println(right.current_vel);
+        Serial.println(left.current_vel,5);
+        Serial.println(right.current_vel,5);
     }
 }
 
-double* Encoder::get_pointer_left_vel()
+float* Encoder::get_pointer_left_vel()
 {
     return &left.current_vel;
 }
 
-double* Encoder::get_pointer_right_vel()
+float* Encoder::get_pointer_right_vel()
 {
     return &right.current_vel;
 }
