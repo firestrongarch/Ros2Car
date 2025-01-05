@@ -8,13 +8,21 @@ public:
         int a,b;
         float current_vel;
     };
+    struct Quaternion{
+        float w;
+        float x;
+        float y;
+        float z;
+    };
     struct Odom{
         float x;                 // 坐标x
         float y;                 // 坐标y
         float yaw;               // yaw
+        Quaternion quaternion;
         float linear_speed;      // 线速度
         float angular_speed;     // 角速度
     };
+
 private:
     // 电机参数
     int reducation = 48;//减速比，根据电机参数设置，比如 15 | 30 | 60
@@ -54,6 +62,24 @@ public:
         linear_speed = (wheel1_speed + wheel2_speed) / 2.0;   // 计算线速度
         angular_speed = (wheel2_speed - wheel1_speed) / wheel_distance_;   // 计算角速度
     }
+
+    // 用于将欧拉角转换为四元数。
+    void Euler2Quaternion(float roll, float pitch, float yaw, Quaternion &q){
+        // 传入机器人的欧拉角 roll、pitch 和 yaw。
+        // 计算欧拉角的 sin 和 cos 值，分别保存在 cr、sr、cy、sy、cp、sp 六个变量中    
+        // https://blog.csdn.net/xiaoma_bk/article/details/79082629
+        double cr = cos(roll * 0.5);
+        double sr = sin(roll * 0.5);
+        double cy = cos(yaw * 0.5);
+        double sy = sin(yaw * 0.5);
+        double cp = cos(pitch * 0.5);
+        double sp = sin(pitch * 0.5);
+        // 计算出四元数的四个分量 q.w、q.x、q.y、q.z
+        q.w = cy * cp * cr + sy * sp * sr;
+        q.x = cy * cp * sr - sy * sp * cr;
+        q.y = sy * cp * sr + cy * sp * cr;
+        q.z = sy * cp * cr - cy * sp * sr;
+    }
     /**
      * @brief 更新机器人里程计信息
      * 
@@ -86,6 +112,8 @@ public:
      * @return odom_t& 
      */
     Odom &odom(){
+        // 调用 Euler2Quaternion 函数，将机器人的欧拉角 yaw 转换为四元数 quaternion。
+        Euler2Quaternion(0, 0, odom_.yaw, odom_.quaternion);
         return odom_;
     }
 };

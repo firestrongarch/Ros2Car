@@ -84,13 +84,13 @@ void twist_callback(const void *msg_in)
         motors.updateState(HIGH);
     }
 
-    if(target_left > 0) {
+    if(target_left >= 0) {
         pid_left.SetControllerDirection(QuickPID::Action::direct);
     } else {
         pid_left.SetControllerDirection(QuickPID::Action::reverse);
     }
 
-    if(target_right > 0) {
+    if(target_right >= 0) {
         pid_right.SetControllerDirection(QuickPID::Action::direct);
     } else {
         pid_right.SetControllerDirection(QuickPID::Action::reverse);
@@ -130,7 +130,7 @@ void microros_task(void *param)
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "/cmd_vel");
-    rclc_publisher_init_best_effort(
+    rclc_publisher_init_default(
         &odom_publisher,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(nav_msgs, msg, Odometry),
@@ -155,7 +155,7 @@ void microros_task(void *param)
 void setup()
 {
     // 初始化串口
-    // Serial.begin(115200);
+    Serial.begin(115200);
 
     // pid_left.SetMode(AUTOMATIC);
     // pid_right.SetMode(AUTOMATIC);
@@ -172,39 +172,47 @@ void setup()
     xTaskCreatePinnedToCore(microros_task, "microros_task", 10240, NULL, 1, NULL, 0);
 }
 
+unsigned long previousMillis = 0; // 上一次打印的时间
+unsigned long interval = 50;      // 间隔时间，单位为毫秒
+
 void loop()
 {
     delay(10);
     encoder.get_current_vel();
     pid_left.Compute();
     pid_right.Compute();
-    if(target_left > 0){
+    if(target_left >= 0){
         motors.updateSpeed(1, left_pwm*100);
     } else {
         motors.updateSpeed(1, -left_pwm*100);
     }
 
-    if(target_right > 0){
+    if(target_right >= 0){
         motors.updateSpeed(2, right_pwm*100);
     } else {
         motors.updateSpeed(2, -right_pwm*100);
     }
     
-    // 用于获取当前的时间戳，并将其存储在消息的头部中
-    int64_t stamp = rmw_uros_epoch_millis();
-    // 获取机器人的位置和速度信息，并将其存储在一个ROS消息（odom_msg）中
-    Encoder::Odom odom = encoder.odom();
-    odom_msg.header.stamp.sec = static_cast<int32_t>(stamp / 1000); // 秒部分
-    odom_msg.header.stamp.nanosec = static_cast<uint32_t>((stamp % 1000) * 1e6); // 纳秒部分
-    odom_msg.pose.pose.position.x = odom.x;
-    odom_msg.pose.pose.position.y = odom.y;
-    // odom_msg.pose.pose.orientation.w = odom.quaternion.w;
-    // odom_msg.pose.pose.orientation.x = odom.quaternion.x;
-    // odom_msg.pose.pose.orientation.y = odom.quaternion.y;
-    // odom_msg.pose.pose.orientation.z = odom.quaternion.z;
+    unsigned long currentMillis = millis(); // 获取当前时间
+    if (currentMillis - previousMillis >= interval) {                                 // 判断是否到达间隔时间
+        previousMillis = currentMillis; // 记录上一次打印的时间
+        float linear_speed, angle_speed;
+      // 用于获取当前的时间戳，并将其存储在消息的头部中
+        int64_t stamp = rmw_uros_epoch_millis();
+        // 获取机器人的位置和速度信息，并将其存储在一个ROS消息（odom_msg）中
+        Encoder::Odom odom = encoder.odom();
+        odom_msg.header.stamp.sec = static_cast<int32_t>(stamp / 1000); // 秒部分
+        odom_msg.header.stamp.nanosec = static_cast<uint32_t>((stamp % 1000) * 1e6); // 纳秒部分
+        odom_msg.pose.pose.position.x = odom.x;
+        odom_msg.pose.pose.position.y = odom.y;
+        odom_msg.pose.pose.orientation.w = odom.quaternion.w;
+        odom_msg.pose.pose.orientation.x = odom.quaternion.x;
+        odom_msg.pose.pose.orientation.y = odom.quaternion.y;
+        odom_msg.pose.pose.orientation.z = odom.quaternion.z;
 
-    odom_msg.twist.twist.angular.z = odom.angular_speed;
-    odom_msg.twist.twist.linear.x = odom.linear_speed;
+        odom_msg.twist.twist.angular.z = odom.angular_speed;
+        odom_msg.twist.twist.linear.x = odom.linear_speed;
 
-    auto ret= rcl_publish(&odom_publisher, &odom_msg, NULL);
+        auto ret= rcl_publish(&odom_publisher, &odom_msg, NULL);
+    }
 }
