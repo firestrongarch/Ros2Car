@@ -10,8 +10,24 @@
 
 #include <PID_v1.h> 
 #include "encoder.h"
+#include "rclc/publisher.h"
+
+#include "fishlog.h"
+#define RCSOFTCHECK(fn)                                                                           \
+    {                                                                                             \
+        rcl_ret_t temp_rc = fn;                                                                   \
+        if ((temp_rc != RCL_RET_OK))                                                              \
+        {                                                                                         \
+            fishlog_debug("ros2",                                                                 \
+                          "Failed status on line %d: %d. Continuing.\n", __LINE__, (int)temp_rc); \
+        }                                                                                         \
+    }
 
 #include <QuickPID.h>
+
+// #include "esp_heap_trace.h"
+// #define NUM_RECORDS 100
+// static heap_trace_record_t trace_record[NUM_RECORDS]; // 该缓冲区必须在内部 RAM 中
 
 // 定义 ROS2 执行器和支持结构
 rclc_executor_t executor;
@@ -28,6 +44,7 @@ geometry_msgs__msg__Twist sub_msg;
 #include <micro_ros_utilities/string_utilities.h>
 rcl_publisher_t odom_publisher;   // 用于发布机器人的里程计信息（Odom）
 nav_msgs__msg__Odometry odom_msg; // 机器人的里程计信息
+rcl_publisher_options_t publisher_options = rcl_publisher_get_default_options();
 
 const int PWMA1 = 18;
 const int PWMA2 = 19;
@@ -114,6 +131,8 @@ void microros_task(void *param)
     // 使用 WiFi 网络和代理 IP 设置 micro-ROS 传输层。
     set_microros_wifi_transports(ssid, pass, agent_ip, 8888);
 
+    // nav_msgs__msg__Odometry__create()
+    // nav_msgs__msg__Odometry__init(&odom_msg); 
     // 使用 micro_ros_string_utilities_set 函数设置到 odom_msg.header.frame_id 中
     odom_msg.header.frame_id = micro_ros_string_utilities_set(odom_msg.header.frame_id, "odom");
     odom_msg.child_frame_id = micro_ros_string_utilities_set(odom_msg.child_frame_id, "base_link");
@@ -129,15 +148,22 @@ void microros_task(void *param)
         &subscriber,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/cmd_vel");
+        "/cmd_vel"
+    );
+
+    publisher_options.qos.depth = 10;
+    publisher_options.qos.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE; // 使用 reliable 策略
+
     rclc_publisher_init_default(
         &odom_publisher,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(nav_msgs, msg, Odometry),
-        "odom");
+        "odom"
+        // &publisher_options.qos
+    );
     
     // 设置 micro-ROS 执行器，并将订阅添加到其中。
-    rclc_executor_init(&executor, &support.context, 1, &allocator);
+    rclc_executor_init(&executor, &support.context, 3, &allocator);
     rclc_executor_add_subscription(&executor, &subscriber, &sub_msg, &twist_callback, ON_NEW_DATA);
 
     // 循环运行 micro-ROS 执行器以处理传入的消息。
@@ -157,9 +183,6 @@ void setup()
     // 初始化串口
     Serial.begin(115200);
 
-    // pid_left.SetMode(AUTOMATIC);
-    // pid_right.SetMode(AUTOMATIC);
-
     //apply PID gains
     pid_left.SetTunings(kp, ki, kd);
     pid_right.SetTunings(kp, ki, kd);
@@ -173,7 +196,7 @@ void setup()
 }
 
 unsigned long previousMillis = 0; // 上一次打印的时间
-unsigned long interval = 50;      // 间隔时间，单位为毫秒
+unsigned long interval = 200;      // 间隔时间，单位为毫秒
 
 void loop()
 {
@@ -196,11 +219,10 @@ void loop()
     unsigned long currentMillis = millis(); // 获取当前时间
     if (currentMillis - previousMillis >= interval) {                                 // 判断是否到达间隔时间
         previousMillis = currentMillis; // 记录上一次打印的时间
-        float linear_speed, angle_speed;
-      // 用于获取当前的时间戳，并将其存储在消息的头部中
+        // 用于获取当前的时间戳，并将其存储在消息的头部中
         int64_t stamp = rmw_uros_epoch_millis();
         // 获取机器人的位置和速度信息，并将其存储在一个ROS消息（odom_msg）中
-        Encoder::Odom odom = encoder.odom();
+        Encoder::Odom& odom = encoder.odom();
         odom_msg.header.stamp.sec = static_cast<int32_t>(stamp / 1000); // 秒部分
         odom_msg.header.stamp.nanosec = static_cast<uint32_t>((stamp % 1000) * 1e6); // 纳秒部分
         odom_msg.pose.pose.position.x = odom.x;
@@ -213,6 +235,6 @@ void loop()
         odom_msg.twist.twist.angular.z = odom.angular_speed;
         odom_msg.twist.twist.linear.x = odom.linear_speed;
 
-        auto ret= rcl_publish(&odom_publisher, &odom_msg, NULL);
+        RCSOFTCHECK(rcl_publish(&odom_publisher, &odom_msg, NULL));
     }
 }

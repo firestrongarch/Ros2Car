@@ -86,13 +86,7 @@ public:
      * @param dt 间隔时间dt
      */
     void update_bot_odom(float dt_s){
-        static float linear_speed, angular_speed;
-        // float dt_s = (float)(dt / 1000) / 1000;
-
-        this->kinematic_forward(left.current_vel, right.current_vel, linear_speed, angular_speed);
-
-        odom_.angular_speed = angular_speed;
-        odom_.linear_speed = linear_speed;
+        this->kinematic_forward(left.current_vel, right.current_vel, odom_.linear_speed, odom_.angular_speed);
 
         odom_.yaw += odom_.angular_speed * dt_s;
 
@@ -104,6 +98,8 @@ public:
         odom_.x += delta_distance * cos(odom_.yaw);
         odom_.y += delta_distance * sin(odom_.yaw);
 
+        // 调用 Euler2Quaternion 函数，将机器人的欧拉角 yaw 转换为四元数 quaternion。
+        Euler2Quaternion(0, 0, odom_.yaw, odom_.quaternion);
     }
     
     /**
@@ -112,8 +108,6 @@ public:
      * @return odom_t& 
      */
     Odom &odom(){
-        // 调用 Euler2Quaternion 函数，将机器人的欧拉角 yaw 转换为四元数 quaternion。
-        Euler2Quaternion(0, 0, odom_.yaw, odom_.quaternion);
         return odom_;
     }
 };
