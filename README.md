@@ -291,17 +291,44 @@ xdg-user-dirs-gtk-update
 export LANG=zh_CH
 ```
 
+#### 堆内存问题
+参考[内存配置](https://micro.ros.org/docs/concepts/benchmarking/memo_prof/):
+- 对于esp32,Client 的总内存消耗高于XRCE-DDS中间件，至少使用库的默认配置参数是这样。但是，通过根据特定应用程序的需要适当地调整其中一些参数（例如，MTU 或历史大小），可以调整总内存消耗以更好地适应目标设备的有限资源。
+
+
 ### 4.4 自动配置micro_ros
+- platformio.ini 自动配置mcu固件
 ```
-# platformio.ini 自动配置mcu固件
 board_microros_transport = wifi
 board_microros_distro = jazzy
 lib_deps = 
 	https://github.com/firestrongarch/micro_ros_platformio
-
-# docker运行客户端
-sudo docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host microros/micro-ros-agent:$ROS_DISTRO serial --dev /dev/ttyUSB0 -v6
-
+```
+- 手动XRCE-DDS配置, 避免堆内存问题, 对于esp32系列: 修改/.pio/libdeps/esp32-c3/micro_ros_platformio/metas/colcon.meta的MAX_HISTORY和MTU
+```
+{
+    "names": {
+        "rmw_microxrcedds": {
+            "cmake-args": [
+                "-DRMW_UXRCE_MAX_NODES=1",
+                "-DRMW_UXRCE_MAX_PUBLISHERS=10",
+                "-DRMW_UXRCE_MAX_SUBSCRIPTIONS=5",
+                "-DRMW_UXRCE_MAX_SERVICES=1",
+                "-DRMW_UXRCE_MAX_CLIENTS=1",
+                "-DRMW_UXRCE_MAX_HISTORY=2",
+                "-DRMW_UXRCE_TRANSPORT=custom"
+            ]
+        },
+        "microxrcedds_client":{
+            "cmake-args":[
+                "-DUCLIENT_CUSTOM_TRANSPORT_MTU=1024"
+            ]
+        }
+    }
+}
+```
+- docker运行Agent
+```
 # UDPv4 micro-ROS Agent
 docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host microros/micro-ros-agent:$ROS_DISTRO udp4 --port 8888 -v6
 

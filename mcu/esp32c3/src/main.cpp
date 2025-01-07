@@ -8,26 +8,10 @@
 #include <rclc/executor.h>
 #include <geometry_msgs/msg/twist.h>
 
-#include <PID_v1.h> 
 #include "encoder.h"
 #include "rclc/publisher.h"
 
-#include "fishlog.h"
-#define RCSOFTCHECK(fn)                                                                           \
-    {                                                                                             \
-        rcl_ret_t temp_rc = fn;                                                                   \
-        if ((temp_rc != RCL_RET_OK))                                                              \
-        {                                                                                         \
-            fishlog_debug("ros2",                                                                 \
-                          "Failed status on line %d: %d. Continuing.\n", __LINE__, (int)temp_rc); \
-        }                                                                                         \
-    }
-
 #include <QuickPID.h>
-
-// #include "esp_heap_trace.h"
-// #define NUM_RECORDS 100
-// static heap_trace_record_t trace_record[NUM_RECORDS]; // 该缓冲区必须在内部 RAM 中
 
 // 定义 ROS2 执行器和支持结构
 rclc_executor_t executor;
@@ -67,14 +51,6 @@ Encoder encoder(ENCBa,ENCBb,ENCAa,ENCAb);
 
 // drv8833电源
 volatile byte state = LOW;
-
-// double left_pwm = 150;//电机驱动的PWM值
-// double right_pwm = 150;//电机驱动的PWM值
-// double target_left, target_right;
-// double kp=1.5, ki=3.0, kd=0.1;
-
-// PID pid_left(encoder.get_pointer_left_vel(),&left_pwm,&target_left,kp,ki,kd,DIRECT);
-// PID pid_right(encoder.get_pointer_right_vel(),&right_pwm,&target_right,kp,ki,kd,DIRECT);
 
 float left_pwm = 0;//电机驱动的PWM值
 float right_pwm = 0;//电机驱动的PWM值
@@ -130,9 +106,10 @@ void microros_task(void *param)
 
     // 使用 WiFi 网络和代理 IP 设置 micro-ROS 传输层。
     set_microros_wifi_transports(ssid, pass, agent_ip, 8888);
+    // 使用串口设置 micro-ROS 传输层。
+    // set_microros_serial_transports(Serial); // 配置串口和波特率
 
-    // nav_msgs__msg__Odometry__create()
-    // nav_msgs__msg__Odometry__init(&odom_msg); 
+
     // 使用 micro_ros_string_utilities_set 函数设置到 odom_msg.header.frame_id 中
     odom_msg.header.frame_id = micro_ros_string_utilities_set(odom_msg.header.frame_id, "odom");
     odom_msg.child_frame_id = micro_ros_string_utilities_set(odom_msg.child_frame_id, "base_link");
@@ -151,15 +128,11 @@ void microros_task(void *param)
         "/cmd_vel"
     );
 
-    publisher_options.qos.depth = 10;
-    publisher_options.qos.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE; // 使用 reliable 策略
-
-    rclc_publisher_init_default(
+    rclc_publisher_init_best_effort(
         &odom_publisher,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(nav_msgs, msg, Odometry),
         "odom"
-        // &publisher_options.qos
     );
     
     // 设置 micro-ROS 执行器，并将订阅添加到其中。
@@ -196,7 +169,7 @@ void setup()
 }
 
 unsigned long previousMillis = 0; // 上一次打印的时间
-unsigned long interval = 200;      // 间隔时间，单位为毫秒
+unsigned long interval = 50;      // 间隔时间，单位为毫秒
 
 void loop()
 {
@@ -234,7 +207,8 @@ void loop()
 
         odom_msg.twist.twist.angular.z = odom.angular_speed;
         odom_msg.twist.twist.linear.x = odom.linear_speed;
-
-        RCSOFTCHECK(rcl_publish(&odom_publisher, &odom_msg, NULL));
+        Serial.println(odom_msg.pose.pose.position.x,5);
+        auto ret = rcl_publish(&odom_publisher, &odom_msg, NULL);
+        Serial.println(ret);
     }
 }
