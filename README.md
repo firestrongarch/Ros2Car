@@ -160,7 +160,7 @@ ros2 run nav2_map_server map_saver_cli -t map -f map
 source ./install/setup.zsh
 ros2 launch ros2car nav2.py
 ```
-![这是图片](doc/nav2.gif "nav2运行状态")
+![这是图片](doc/nav2_sim.gif "nav2运行状态")
 问题1 rviz2不能加载地图
 原因: nav2的地图话题只会发布一次, 确保rviz2在其之前启动且已经提前订阅好话题
 
@@ -335,14 +335,14 @@ docker run -it --rm -v /dev:/dev -v /dev/shm:/dev/shm --privileged --net=host mi
 ```
 
 ### 4.5 开发esp32c3
-1. 串口通信
+- 串口通信
 💡确定串口名称/dev/ttyACM0
 ```
 // 初始化串口
 Serial.begin(115200);
 Serial.println(val)
 ```
-2. pwm输出, 使用analogwrite的方式实现
+- pwm输出, 使用analogwrite的方式实现
 ```
 analogWrite(pin, dutycycle)：在指定的引脚上启用软件PWM。占空比在0到PWMRANGE之间，默认为1023。
 
@@ -352,7 +352,9 @@ analogWriteResolution(new_range)：该功能用于改变PWM分辨率。
 
 analogWriteFrequency(new_frequency)：调用此功能可将其更改为新频率.PWM频率范围为1 - 1000hz。
 ```
-
+- 发布odom测试
+手动转动轮子, 编码器测出速度, 根据运动学计算里程计信息, 通过microros发布odom话题. 可以看到转动后rviz2更新了odom信息
+![这是图片](doc/odom.gif "odom测试")
 
 
 ### 4.6 开发esp32CAM
@@ -402,7 +404,15 @@ rviz2
 问题1: qos不兼容导致rviz2显示不出雷达
 解决: 在雷达话题显示菜单中, 选择Reliability Policy为Best Effort
 
-# MarkDown本地渲染配置
+### 4.8 运行测试
+- cartorgrapher运行
+![这是图片](doc/slam.gif "cartorgrapher")
+
+- nav2运行
+![这是图片](doc/nav2.gif "cartorgrapher")
+
+
+# Markdown本地渲染配置
 ```
 # 安装katex
 sudo apt install katex
