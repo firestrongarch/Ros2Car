@@ -1,12 +1,3 @@
----
-title: "Habits"
-author: John Doe
-date: March 22, 2005
-output:
-    pdf_document:
-        latex_engine: pdflatex
----
-
 # Ros2Car
 
 ## 1 硬件环境

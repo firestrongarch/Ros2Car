@@ -57,19 +57,62 @@ def generate_launch_description():
         # parameters=[{'use_sim_time': use_sim_time}],
         output='screen')
 
-    # robot_state_publisher = Node(
-    #     package='robot_state_publisher',
-    #     executable='robot_state_publisher',
-    #     name='robot_state_publisher',
-    #     output='both',
-    #     parameters=[
-    #         {'use_sim_time': True},
-    #         {'robot_description': robot_desc},
-    #     ]
-    # )
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='both',
+        parameters=[
+            {'use_sim_time': True},
+            {'robot_description': robot_desc},
+            {'frame_prefix': 'car/'},  # 确保没有前缀
+        ],
+    )
+
+    joint_state_publisher = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
+        output='screen',
+    )
+
+    car_bringup_node = Node(
+        package='ros2car',
+        executable='car_bringup',
+        name='car_bringup',
+        output='screen',
+    )
+
+    # 添加静态变换发布器节点
+    static_tf_odom_to_laserframe = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'laser_frame'],
+        output='screen',
+    )
+
+    static_tf_odom_to_car = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'car'],
+        output='screen',
+    )
+
+    static_tf_odom_to_base = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_link'],
+        output='screen',
+    )
 
     #===============================================定义启动文件========================================================
     return LaunchDescription([
+        car_bringup_node,
+        robot_state_publisher,
+        joint_state_publisher,
+        static_tf_odom_to_laserframe,
+        static_tf_odom_to_car,
+        static_tf_odom_to_base,
         rviz_node,
         cartographer_node,
         cartographer_occupancy_grid_node,
